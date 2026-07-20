@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomNavContainer"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="#FFFFFF"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:elevation="10dp">
+
+    <LinearLayout
+        android:id="@+id/navProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/ivNavProfile"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/user"
+            app:tint="#94A3B8" />
+        <TextView
+            android:id="@+id/tvNavProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="حسابي"
+            android:textColor="#94A3B8"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navWallet"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/ivNavWallet"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/wallet"
+            app:tint="#94A3B8" />
+        <TextView
+            android:id="@+id/tvNavWallet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="المحفظة"
+            android:textColor="#94A3B8"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navOrders"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/ivNavOrders"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/personal"
+            app:tint="#94A3B8" />
+        <TextView
+            android:id="@+id/tvNavOrders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="طلباتي"
+            android:textColor="#94A3B8"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navHome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/ivNavHome"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/home"
+            app:tint="#94A3B8" />
+        <TextView
+            android:id="@+id/tvNavHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="الرئيسية"
+            android:textColor="#94A3B8"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+</LinearLayout>

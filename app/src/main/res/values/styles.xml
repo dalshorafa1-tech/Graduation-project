@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextStyle_72sp">
+        <item name="android:textSize">72sp</item>
+        <item name="android:textColor">#FF1A6FA3</item>
+        <item name="android:fontFamily">Cairo</item>
+    </style>
+    <style name="TextStyle_20sp">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#FF1A6FA3</item>
+        <item name="android:fontFamily">Inter</item>
+    </style>
+    <style name="CircleImageViewStyle">
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="RoundedImageViewStyle">
+        <item name="cornerSize">14dp</item>
+    </style>
+    <style name="CustomRatingBarTheme">
+        <item name="colorControlNormal">#CBDCE9</item> <item name="colorControlActivated">#FFB000</item> </style>
+        <style name="CircleImage">
+            <item name="cornerSize">50%</item>
+        </style>
+
+</resources>

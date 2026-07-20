@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8FAFC">
+
+    <RelativeLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="إرواء"
+            android:textColor="#0069B4"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/back"
+            app:tint="#0069B4" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="32dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardLogo"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#0069B4"
+                app:cardElevation="0dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_water_drop"
+                    android:layout_gravity="center"
+                    app:tint="#FFFFFF" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="إنشاء حساب جديد"
+                android:textColor="#111111"
+                android:textSize="22sp"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/cardLogo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/tvDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="انضم إلى منصة إرواء لإدارة خدمات المياه بكل سهولة وموثوقية."
+                android:textColor="#666666"
+                android:textSize="13sp"
+                android:layout_marginTop="4dp"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardForm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@id/tvDesc">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="الاسم الكامل"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:layout_gravity="right" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_field"
+                        android:layout_marginTop="6dp"
+                        android:paddingHorizontal="12dp"
+                        android:gravity="center_vertical">
+                        <EditText
+                            android:id="@+id/etFullName"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="أدخل اسمك رباعياً"
+                            android:gravity="right|center_vertical"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="8dp" />
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_menu_myplaces"
+                            app:tint="#888888" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="البريد الإلكتروني"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_gravity="right" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_field"
+                        android:layout_marginTop="6dp"
+                        android:paddingHorizontal="12dp"
+                        android:gravity="center_vertical">
+                        <EditText
+                            android:id="@+id/etEmail"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="example@mail.com"
+                            android:gravity="right|center_vertical"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="8dp"
+                            android:inputType="textEmailAddress" />
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_dialog_email"
+                            app:tint="#888888" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="كلمة المرور"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_gravity="right" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_field"
+                        android:layout_marginTop="6dp"
+                        android:paddingHorizontal="12dp"
+                        android:gravity="center_vertical">
+                        <EditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="********"
+                            android:gravity="right|center_vertical"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="8dp"
+                            android:inputType="textPassword" />
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_lock_idle_lock"
+                            app:tint="#888888" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="رقم الهوية"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_gravity="right" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_field"
+                        android:layout_marginTop="6dp"
+                        android:paddingHorizontal="12dp"
+                        android:gravity="center_vertical">
+                        <EditText
+                            android:id="@+id/etIdNumber"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="رقم الهوية المكون من 9 أرقام"
+                            android:gravity="right|center_vertical"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="8dp"
+                            android:inputType="number" />
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_menu_agenda"
+                            app:tint="#888888" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="المنطقة السكنية"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_gravity="right" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutRegion"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_field"
+                        android:layout_marginTop="6dp"
+                        android:paddingHorizontal="12dp"
+                        android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="#888888" />
+                        <TextView
+                            android:id="@+id/tvRegion"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:text="اختر منطقة السكن"
+                            android:textColor="#A0AEC0"
+                            android:gravity="right|center_vertical"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="8dp" />
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_menu_directions"
+                            app:tint="#888888" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="رقم الجوال"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:layout_marginTop="16dp"
+                        android:layout_gravity="right" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_field"
+                        android:layout_marginTop="6dp"
+                        android:paddingHorizontal="12dp"
+                        android:gravity="center_vertical">
+                        <EditText
+                            android:id="@+id/etPhone"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:hint="059 XXXXXXX"
+                            android:gravity="right|center_vertical"
+                            android:textSize="14sp"
+                            android:paddingHorizontal="8dp"
+                            android:inputType="phone" />
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@android:drawable/ic_menu_call"
+                            app:tint="#888888" />
+                    </LinearLayout>
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="أوافق على الشروط والأحكام و سياسة الخصوصية الخاصة بمنصة إرواء لإدارة خدمات المياه."
+                        android:textColor="#666666"
+                        android:textSize="11sp"
+
+                        android:layout_marginTop="16dp"
+                        android:layout_gravity="right"
+                        android:layoutDirection="rtl"
+                        android:buttonTint="#0069B4"
+                        android:paddingRight="8dp" />
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btnRegister"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        app:cardCornerRadius="24dp"
+                        app:cardBackgroundColor="#0069B4"
+                        app:cardElevation="0dp"
+                        android:layout_marginTop="24dp"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_gravity="center">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="إنشاء الحساب"
+                                android:textColor="#FFFFFF"
+                                android:textSize="15sp" />
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@android:drawable/ic_menu_add"
+                                android:layout_marginLeft="8dp"
+                                app:tint="#FFFFFF" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp"
+                app:layout_constraintTop_toBottomOf="@id/cardForm"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+                <TextView
+                    android:id="@+id/btnLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="تسجيل الدخول"
+                    android:textColor="#0069B4"
+                    android:textSize="14sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="لديك حساب بالفعل؟ "
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,14 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <org.osmdroid.views.MapView
-            android:id="@+id/map"
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/mapview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:layout_height="match_parent" />
+
 
         <!-- صندوق البحث -->
         <com.google.android.material.card.MaterialCardView
@@ -184,6 +181,31 @@
                 app:backgroundTint="#FFFFFF"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
+
+        <!-- زر تسجيل الدخول (يظهر عند عدم تسجيل الدخول) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnLoginMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="#0056C6"
+            app:layout_constraintTop_toBottomOf="@id/cardSearch"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="تسجيل الدخول"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+        </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- البطاقة السفلية (Bottom Sheet) -->

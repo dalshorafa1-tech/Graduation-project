@@ -3,8 +3,8 @@ package com.example.graduationproject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -20,12 +20,13 @@ import java.util.Map;
 
 public class AdminLoginActivity extends AppCompatActivity {
 
+    private static final String TAG = "AdminLogin";
     private static final String DEFAULT_ADMIN_EMAIL = "admin@erwaa.com";
     private static final String DEFAULT_ADMIN_PASSWORD = "admin123";
 
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnLogin;
-    private View btnBack; // تم تغييره إلى View ليتوافق مع ImageView في الـ XML
+    private View btnBack;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -50,30 +51,24 @@ public class AdminLoginActivity extends AppCompatActivity {
             btnLogin.setOnClickListener(v -> loginAdmin());
         }
 
-        // إنشاء أدمن افتراضي إذا لم يكن موجوداً
         createDefaultAdminIfNeeded();
     }
 
     private void createDefaultAdminIfNeeded() {
-        db.collection("admins").limit(1).get()
-                .addOnSuccessListener(snap -> {
-                    if (snap.isEmpty()) {
+        db.collection("admins").document(DEFAULT_ADMIN_EMAIL).get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
                         mAuth.createUserWithEmailAndPassword(DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD)
-                                .addOnSuccessListener(authResult -> {
+                                .addOnCompleteListener(task -> {
                                     Map<String, Object> adminData = new HashMap<>();
                                     adminData.put("role", "admin");
                                     adminData.put("email", DEFAULT_ADMIN_EMAIL);
-                                    db.collection("admins").document(DEFAULT_ADMIN_EMAIL)
-                                            .set(adminData);
-                                })
-                                .addOnFailureListener(e -> {
-                                    Map<String, Object> adminData = new HashMap<>();
-                                    adminData.put("role", "admin");
-                                    adminData.put("email", DEFAULT_ADMIN_EMAIL);
-                                    db.collection("admins").document(DEFAULT_ADMIN_EMAIL)
-                                            .set(adminData);
+                                    db.collection("admins").document(DEFAULT_ADMIN_EMAIL).set(adminData);
                                 });
                     }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Check admin failed", e);
                 });
     }
 
@@ -93,30 +88,35 @@ public class AdminLoginActivity extends AppCompatActivity {
         btnLogin.setEnabled(false);
         btnLogin.setText("جاري تسجيل الدخول...");
 
-        db.collection("admins").document(email.toLowerCase()).get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        mAuth.signInWithEmailAndPassword(email, password)
-                                .addOnSuccessListener(authResult -> {
-                                    Toast.makeText(this, "مرحباً أيها الأدمن", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(this, AdminServicesActivity.class));
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
+                    db.collection("admins").document(email.toLowerCase()).get()
+                            .addOnSuccessListener(doc -> {
+                                if (doc.exists() && "admin".equals(doc.getString("role"))) {
+                                    Toast.makeText(this, "مرحباً أيها المشرف", Toast.LENGTH_SHORT).show();
+                                    // الانتقال لواجهة التحكم الرئيسية الجديدة
+                                    Intent intent = new Intent(this, AdminInitiativesActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
                                     finish();
-                                })
-                                .addOnFailureListener(e -> {
+                                } else {
+                                    mAuth.signOut();
                                     btnLogin.setEnabled(true);
                                     btnLogin.setText("تسجيل الدخول");
-                                    Toast.makeText(this, "خطأ في البريد أو كلمة المرور", Toast.LENGTH_SHORT).show();
-                                });
-                    } else {
-                        btnLogin.setEnabled(true);
-                        btnLogin.setText("تسجيل الدخول");
-                        Toast.makeText(this, "ليس لديك صلاحية الأدمن", Toast.LENGTH_SHORT).show();
-                    }
+                                    Toast.makeText(this, "ليس لديك صلاحية الأدمن", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                mAuth.signOut();
+                                btnLogin.setEnabled(true);
+                                btnLogin.setText("تسجيل الدخول");
+                                Toast.makeText(this, "فشل التحقق من الصلاحيات", Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .addOnFailureListener(e -> {
                     btnLogin.setEnabled(true);
                     btnLogin.setText("تسجيل الدخول");
-                    Toast.makeText(this, "فشل الاتصال", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "خطأ في البريد أو كلمة المرور", Toast.LENGTH_SHORT).show();
                 });
     }
 }

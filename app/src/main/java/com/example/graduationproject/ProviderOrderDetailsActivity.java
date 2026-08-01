@@ -4,51 +4,57 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 
 import java.util.Locale;
 
-public class ProviderOrderDetailsActivity extends AppCompatActivity {
+public class ProviderOrderDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private TextView tvOrderNumber, tvOrderStatus, tvCustomerName, tvCustomerAddress, tvWaterType, tvWaterQty, tvPriceTotal;
     private ImageView imgCustomer;
     private MaterialButton btnConfirmArrival, btnCompleteTask;
     private View btnCallCustomer;
     private MapView map;
+    private MapboxMap mapboxMap;
     private FirebaseFirestore db;
     private String orderId, customerPhone;
     private ListenerRegistration orderListener;
+    private LatLng deliveryLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // إعدادات الخريطة
-        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        // Initialize Mapbox
+        Mapbox.getInstance(this);
+        
         setContentView(R.layout.activity_provider_order_details);
 
         db = FirebaseFirestore.getInstance();
         orderId = getIntent().getStringExtra("order_id");
 
-        initViews();
+        initViews(savedInstanceState);
         
         if (orderId != null) {
             fetchOrderDetails();
@@ -58,7 +64,7 @@ public class ProviderOrderDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void initViews() {
+    private void initViews(Bundle savedInstanceState) {
         tvOrderNumber = findViewById(R.id.tvOrderNumber);
         tvOrderStatus = findViewById(R.id.tvOrderStatus);
         tvCustomerName = findViewById(R.id.tvCustomerName);
@@ -90,15 +96,20 @@ public class ProviderOrderDetailsActivity extends AppCompatActivity {
         btnConfirmArrival.setOnClickListener(v -> updateStatus("on_way"));
         btnCompleteTask.setOnClickListener(v -> updateStatus("delivered"));
 
-        setupMap();
+        if (map != null) {
+            map.onCreate(savedInstanceState);
+            map.getMapAsync(this);
+        }
     }
 
-    private void setupMap() {
-        if (map != null) {
-            map.setTileSource(TileSourceFactory.MAPNIK);
-            map.setMultiTouchControls(true);
-            map.getController().setZoom(15.0);
-        }
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+        mapboxMap.setStyle(new Style.Builder().fromUri("https://tiles.openfreemap.org/styles/bright"), style -> {
+            if (deliveryLocation != null) {
+                updateMapMarker(deliveryLocation);
+            }
+        });
     }
 
     private void fetchOrderDetails() {
@@ -124,15 +135,10 @@ public class ProviderOrderDetailsActivity extends AppCompatActivity {
                 
                 // تحديث موقع الزبون على الخريطة
                 if (order.getDeliveryLat() != 0) {
-                    GeoPoint point = new GeoPoint(order.getDeliveryLat(), order.getDeliveryLng());
-                    map.getController().setCenter(point);
-                    Marker marker = new Marker(map);
-                    marker.setPosition(point);
-                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    marker.setTitle("موقع الزبون");
-                    map.getOverlays().clear();
-                    map.getOverlays().add(marker);
-                    map.invalidate();
+                    deliveryLocation = new LatLng(order.getDeliveryLat(), order.getDeliveryLng());
+                    if (mapboxMap != null && mapboxMap.getStyle() != null) {
+                        updateMapMarker(deliveryLocation);
+                    }
                 }
 
                 // جلب بيانات الزبون الإضافية (الاسم، الهاتف، الصورة)
@@ -141,6 +147,21 @@ public class ProviderOrderDetailsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void updateMapMarker(LatLng point) {
+        if (mapboxMap == null) return;
+        mapboxMap.clear();
+        mapboxMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title("موقع الزبون"));
+        
+        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                new CameraPosition.Builder()
+                        .target(point)
+                        .zoom(15.0)
+                        .build()
+        ));
     }
 
     private void fetchCustomerInfo(String customerId) {
@@ -195,11 +216,15 @@ public class ProviderOrderDetailsActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "فشل التحديث", Toast.LENGTH_SHORT).show());
     }
 
-    @Override public void onResume() { super.onResume(); if (map != null) map.onResume(); }
-    @Override public void onPause() { super.onPause(); if (map != null) map.onPause(); }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    @Override protected void onStart() { super.onStart(); if (map != null) map.onStart(); }
+    @Override protected void onResume() { super.onResume(); if (map != null) map.onResume(); }
+    @Override protected void onPause() { super.onPause(); if (map != null) map.onPause(); }
+    @Override protected void onStop() { super.onStop(); if (map != null) map.onStop(); }
+    @Override protected void onSaveInstanceState(@NonNull Bundle outState) { super.onSaveInstanceState(outState); if (map != null) map.onSaveInstanceState(outState); }
+    @Override public void onLowMemory() { super.onLowMemory(); if (map != null) map.onLowMemory(); }
+    @Override protected void onDestroy() { 
         if (orderListener != null) orderListener.remove();
+        if (map != null) map.onDestroy(); 
+        super.onDestroy();
     }
 }

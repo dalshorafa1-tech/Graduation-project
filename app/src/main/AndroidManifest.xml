@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+
     <queries>
         <package android:name="com.google.android.gms" />
     </queries>
@@ -66,7 +67,11 @@
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".Order_Details_Activity" />
         <activity android:name=".ProviderOrderDetailsActivity" />
+
+        <!-- Admin Activities -->
         <activity android:name=".AdminServicesActivity" />
+        <activity android:name=".AdminInitiativesActivity" />
+        <activity android:name=".AdminUsersActivity" />
         <activity android:name=".AddEditServiceActivity" />
         <activity android:name=".AdminLoginActivity" />
         <activity android:name=".AddServiceActivity" />

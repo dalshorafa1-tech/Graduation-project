@@ -42,6 +42,11 @@ dependencies {
     implementation libs.glide
     annotationProcessor libs.glide.compiler
 
+
+        // مكتبة MapLibre (المسؤولة عن عرض الخريطة)
+        implementation 'org.maplibre.gl:android-sdk:10.2.0'
+
+
     // 1. استيراد منصة Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:33.10.0')
 

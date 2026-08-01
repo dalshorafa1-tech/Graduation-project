@@ -3,30 +3,36 @@ package com.example.graduationproject;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 
-public class Order_Checkout_Activity extends AppCompatActivity {
+public class Order_Checkout_Activity extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mapView;
+    private MapboxMap mapboxMap;
+    private Marker deliveryMarker;
     private int quantity = 500;
     private String unit = "لتر";
     private String selectedTime = "الآن";
-    private GeoPoint selectedLocation = new GeoPoint(31.516, 34.448);
+    private LatLng selectedLocation = new LatLng(31.516, 34.448);
 
     private TextView tvQuantityCount, tvUnit;
     private CardView btnByLiter, btnByTank;
@@ -38,7 +44,9 @@ public class Order_Checkout_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        // Initialize Mapbox
+        Mapbox.getInstance(this);
+        
         setContentView(R.layout.activity_order_checkout);
 
         // استقبال بيانات المزود والخدمة
@@ -80,27 +88,15 @@ public class Order_Checkout_Activity extends AppCompatActivity {
             updateQuantityText();
         });
 
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.setMultiTouchControls(true);
-        mapView.getController().setZoom(15.0);
-        mapControllerSetCenter();
-
-        Marker startMarker = new Marker(mapView);
-        startMarker.setPosition(selectedLocation);
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        startMarker.setTitle("موقع التوصيل");
-        startMarker.setDraggable(true);
-        startMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-            @Override public void onMarkerDrag(Marker marker) {}
-            @Override public void onMarkerDragEnd(Marker marker) {
-                selectedLocation = (GeoPoint) marker.getPosition();
-            }
-            @Override public void onMarkerDragStart(Marker marker) {}
-        });
-        mapView.getOverlays().add(startMarker);
+        if (mapView != null) {
+            mapView.onCreate(savedInstanceState);
+            mapView.getMapAsync(this);
+        }
 
         btnLocateMe.setOnClickListener(v -> {
-            mapView.getController().animateTo(selectedLocation);
+            if (mapboxMap != null) {
+                mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 15.0));
+            }
         });
 
         btnSubmitOrder.setOnClickListener(v -> {
@@ -127,19 +123,46 @@ public class Order_Checkout_Activity extends AppCompatActivity {
         setupBottomNavigation();
     }
 
-    private void mapControllerSetCenter() {
-        if (mapView != null) mapView.getController().setCenter(selectedLocation);
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+        mapboxMap.setStyle(new Style.Builder().fromUri("https://tiles.openfreemap.org/styles/bright"), style -> {
+            
+            deliveryMarker = mapboxMap.addMarker(new MarkerOptions()
+                    .position(selectedLocation)
+                    .title("موقع التوصيل"));
+            
+            mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                    new CameraPosition.Builder()
+                            .target(selectedLocation)
+                            .zoom(15.0)
+                            .build()
+            ));
+
+            mapboxMap.addOnMapClickListener(point -> {
+                selectedLocation = point;
+                deliveryMarker.setPosition(point);
+                return true;
+            });
+        });
     }
 
     private void setupBottomNavigation() {
-        findViewById(R.id.navHome).setOnClickListener(v -> {
-            Intent intent = new Intent(this, MapExplorerActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
-        findViewById(R.id.navWallet).setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
-        findViewById(R.id.navOrders).setOnClickListener(v -> startActivity(new Intent(this, My_Orders_Activity.class)));
-        findViewById(R.id.navProfile).setOnClickListener(v -> startActivity(new Intent(this, HomeActivity.class)));
+        View navHome = findViewById(R.id.navHome);
+        View navWallet = findViewById(R.id.navWallet);
+        View navOrders = findViewById(R.id.navOrders);
+        View navProfile = findViewById(R.id.navProfile);
+
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MapExplorerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            });
+        }
+        if (navWallet != null) navWallet.setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
+        if (navOrders != null) navOrders.setOnClickListener(v -> startActivity(new Intent(this, My_Orders_Activity.class)));
+        if (navProfile != null) navProfile.setOnClickListener(v -> startActivity(new Intent(this, HomeActivity.class)));
     }
 
     private void updateQuantityText() {
@@ -160,6 +183,11 @@ public class Order_Checkout_Activity extends AppCompatActivity {
         updateQuantityText();
     }
 
+    @Override protected void onStart() { super.onStart(); if (mapView != null) mapView.onStart(); }
     @Override protected void onResume() { super.onResume(); if (mapView != null) mapView.onResume(); }
     @Override protected void onPause() { super.onPause(); if (mapView != null) mapView.onPause(); }
+    @Override protected void onStop() { super.onStop(); if (mapView != null) mapView.onStop(); }
+    @Override protected void onSaveInstanceState(@NonNull Bundle outState) { super.onSaveInstanceState(outState); if (mapView != null) mapView.onSaveInstanceState(outState); }
+    @Override public void onLowMemory() { super.onLowMemory(); if (mapView != null) mapView.onLowMemory(); }
+    @Override protected void onDestroy() { if (mapView != null) mapView.onDestroy(); super.onDestroy(); }
 }

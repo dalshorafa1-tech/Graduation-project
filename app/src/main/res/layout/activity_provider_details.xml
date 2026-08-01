@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8FAFC"
@@ -42,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <!-- Provider Content (Image, details, map, reviews) ... -->
+
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
@@ -74,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/tvLocation"
                     android:layout_width="wrap_content"
@@ -81,11 +83,45 @@
                     android:text="حي الرمال، غزة"
                     android:textColor="#64748B" />
 
-                <org.osmdroid.views.MapView
-                    android:id="@+id/mapView"
+                <!-- حاوية الخريطة مع أزرار التحكم -->
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginTop="16dp" />
+                    android:layout_height="200dp"
+                    android:layout_marginTop="16dp">
+
+                    <com.mapbox.mapboxsdk.maps.MapView
+                        android:id="@+id/mapView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <!-- أزرار الزووم -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="left|bottom"
+                        android:layout_margin="8dp">
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnZoomIn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:src="@android:drawable/ic_input_add"
+                            app:fabSize="mini"
+                            app:backgroundTint="#FFFFFF"
+                            tools:ignore="ContentDescription" />
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnZoomOut"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@android:drawable/ic_input_delete"
+                            app:fabSize="mini"
+                            app:backgroundTint="#FFFFFF"
+                            tools:ignore="ContentDescription" />
+                    </LinearLayout>
+                </FrameLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
@@ -97,7 +133,6 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Action Bar (Price & Select Button) -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutBottomBar"
             android:layout_width="match_parent"
@@ -139,7 +174,6 @@
                 app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Global Navigation Bar -->
         <LinearLayout
             android:id="@+id/bottomNavProvider"
             android:layout_width="match_parent"

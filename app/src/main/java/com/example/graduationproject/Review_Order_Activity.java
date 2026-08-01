@@ -2,30 +2,34 @@ package com.example.graduationproject;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Review_Order_Activity extends AppCompatActivity {
+public class Review_Order_Activity extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mapView;
-    private GeoPoint deliveryLoc;
+    private MapboxMap mapboxMap;
+    private LatLng deliveryLoc;
 
     private int quantity;
     private String unit, address, notes, scheduledTime;
@@ -40,18 +44,17 @@ public class Review_Order_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Configuration.getInstance().setUserAgentValue(getPackageName());
-        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        // Initialize Mapbox
+        Mapbox.getInstance(this);
 
         setContentView(R.layout.activity_review_order);
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        initViews();
+        initViews(savedInstanceState);
 
         Intent data = getIntent();
-        // محاولة جلب الـ ID كنص، وإذا فشل نجلب كـ int ونحوله (لزيادة الأمان)
         serviceId = data.getStringExtra("service_id");
         if (serviceId == null && data.hasExtra("service_id")) {
             serviceId = String.valueOf(data.getIntExtra("service_id", 0));
@@ -67,9 +70,8 @@ public class Review_Order_Activity extends AppCompatActivity {
 
         double lat = data.getDoubleExtra("lat", 31.516);
         double lng = data.getDoubleExtra("lng", 34.448);
-        deliveryLoc = new GeoPoint(lat, lng);
+        deliveryLoc = new LatLng(lat, lng);
 
-        // إذا كان السعر مرسلاً مسبقاً (كما في الاشتراكات) نستخدمه مباشرة
         if (data.hasExtra("total_price_from_plan")) {
             totalPrice = data.getDoubleExtra("total_price_from_plan", 0.0);
             updateUI("اشتراك مياه شهري");
@@ -81,7 +83,7 @@ public class Review_Order_Activity extends AppCompatActivity {
         }
     }
 
-    private void initViews() {
+    private void initViews(Bundle savedInstanceState) {
         tvServiceName = findViewById(R.id.tvServiceName);
         tvLocationMain = findViewById(R.id.tvLocationMain);
         tvOrderNotes = findViewById(R.id.tvOrderNotes);
@@ -90,8 +92,38 @@ public class Review_Order_Activity extends AppCompatActivity {
         tvFooterPriceText = findViewById(R.id.tvFooterPriceText);
         mapView = findViewById(R.id.mapViewReview);
 
+        if (mapView != null) {
+            mapView.onCreate(savedInstanceState);
+            mapView.getMapAsync(this);
+        }
+
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         findViewById(R.id.btnConfirmAndSend).setOnClickListener(v -> saveOrderToFirebase());
+    }
+
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+        mapboxMap.setStyle(new Style.Builder().fromUri("https://tiles.openfreemap.org/styles/bright"), style -> {
+            if (deliveryLoc != null) {
+                updateMapMarker(deliveryLoc);
+            }
+        });
+    }
+
+    private void updateMapMarker(LatLng point) {
+        if (mapboxMap == null) return;
+        mapboxMap.clear();
+        mapboxMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title("موقع التوصيل"));
+        
+        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                new CameraPosition.Builder()
+                        .target(point)
+                        .zoom(15.0)
+                        .build()
+        ));
     }
 
     private void fetchRealDataAndCalculate() {
@@ -106,7 +138,6 @@ public class Review_Order_Activity extends AppCompatActivity {
                             updateUI(service.getNameAr());
                         }
                     } else {
-                        // في حال لم يتم العثور على الخدمة، نستخدم سعر افتراضي بدلاً من الانهيار
                         totalPrice = (unit != null && unit.equals("لتر")) ? (quantity * 0.05) + 10.0 : 30.0;
                         updateUI(providerName != null ? providerName : "طلب مياه");
                     }
@@ -124,19 +155,6 @@ public class Review_Order_Activity extends AppCompatActivity {
         tvWaterPrice.setText(String.format("%.2f ₪", Math.max(0, totalPrice - 10.0)));
         tvTotalPriceMain.setText(String.format("%.2f ₪", totalPrice));
         tvFooterPriceText.setText(String.format("%.2f ₪", totalPrice));
-
-        if (mapView != null) {
-            mapView.setTileSource(TileSourceFactory.MAPNIK);
-            mapView.getController().setZoom(16.0);
-            mapView.getController().setCenter(deliveryLoc);
-            Marker marker = new Marker(mapView);
-            marker.setPosition(deliveryLoc);
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setTitle("موقعك");
-            mapView.getOverlays().clear();
-            mapView.getOverlays().add(marker);
-            mapView.invalidate();
-        }
     }
 
     private void saveOrderToFirebase() {
@@ -171,6 +189,11 @@ public class Review_Order_Activity extends AppCompatActivity {
                 });
     }
 
-    @Override protected void onResume() { super.onResume(); if(mapView!=null) mapView.onResume(); }
-    @Override protected void onPause() { super.onPause(); if(mapView!=null) mapView.onPause(); }
+    @Override protected void onStart() { super.onStart(); if (mapView != null) mapView.onStart(); }
+    @Override protected void onResume() { super.onResume(); if (mapView != null) mapView.onResume(); }
+    @Override protected void onPause() { super.onPause(); if (mapView != null) mapView.onPause(); }
+    @Override protected void onStop() { super.onStop(); if (mapView != null) mapView.onStop(); }
+    @Override protected void onSaveInstanceState(@NonNull Bundle outState) { super.onSaveInstanceState(outState); if (mapView != null) mapView.onSaveInstanceState(outState); }
+    @Override public void onLowMemory() { super.onLowMemory(); if (mapView != null) mapView.onLowMemory(); }
+    @Override protected void onDestroy() { if (mapView != null) mapView.onDestroy(); super.onDestroy(); }
 }

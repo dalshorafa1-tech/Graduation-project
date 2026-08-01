@@ -128,7 +128,7 @@
                         android:layout_marginTop="12dp"
                         app:cardCornerRadius="8dp"
                         app:cardElevation="0dp">
-                        <org.osmdroid.views.MapView
+                        <com.mapbox.mapboxsdk.maps.MapView
                             android:id="@+id/mapViewReview"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />

@@ -1,5 +1,6 @@
 package com.example.graduationproject;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.Exclude;
 
 public class NotificationModel {
@@ -13,7 +14,7 @@ public class NotificationModel {
     private String type;
     private String order_id;
     private boolean is_read;
-    private Object created_at;
+    private Timestamp created_at;
 
     public NotificationModel() {}
 
@@ -39,6 +40,6 @@ public class NotificationModel {
     public boolean isRead() { return is_read; }
     public void setRead(boolean is_read) { this.is_read = is_read; }
 
-    public Object getCreated_at() { return created_at; }
-    public void setCreated_at(Object created_at) { this.created_at = created_at; }
+    public Timestamp getCreated_at() { return created_at; }
+    public void setCreated_at(Timestamp created_at) { this.created_at = created_at; }
 }

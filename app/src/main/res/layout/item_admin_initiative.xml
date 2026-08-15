@@ -89,5 +89,37 @@
                 android:textStyle="bold" />
         </RelativeLayout>
 
+        <LinearLayout
+            android:id="@+id/layoutActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:visibility="gone">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApproveInitiative"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="قبول"
+                android:textSize="12sp"
+                app:backgroundTint="#00A896"
+                app:cornerRadius="8dp"
+                style="@style/Widget.Material3.Button"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRejectInitiative"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="رفض"
+                android:textSize="12sp"
+                app:backgroundTint="#EF4444"
+                app:cornerRadius="8dp"
+                style="@style/Widget.Material3.Button"/>
+        </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

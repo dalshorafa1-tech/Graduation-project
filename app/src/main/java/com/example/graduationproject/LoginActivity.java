@@ -150,6 +150,8 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent;
         if ("provider".equalsIgnoreCase(role)) {
             intent = new Intent(LoginActivity.this, ProviderDashboardActivity.class);
+        } else if ("initiator".equalsIgnoreCase(role)) {
+            intent = new Intent(LoginActivity.this, InitiatorDashboardActivity.class);
         } else {
             intent = new Intent(LoginActivity.this, MapExplorerActivity.class);
         }

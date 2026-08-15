@@ -10,6 +10,9 @@
 
     <queries>
         <package android:name="com.google.android.gms" />
+        <intent>
+            <action android:name="com.google.android.gms.plus.action.QUICK_RELAY" />
+        </intent>
     </queries>
 
     <application
@@ -25,6 +28,10 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="YOUR_API_KEY_HERE" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".MainActivity"
@@ -49,6 +56,7 @@
         <activity android:name=".UserTypeActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".RegisterProviderActivity" />
+        <activity android:name=".RegisterInitiatorActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".ResetPasswordActivity" />
         <activity android:name=".HomeActivity" />
@@ -67,8 +75,10 @@
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".Order_Details_Activity" />
         <activity android:name=".ProviderOrderDetailsActivity" />
+        <activity android:name=".DeliveryConfirmationActivity" />
 
         <!-- Admin Activities -->
+        <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".AdminServicesActivity" />
         <activity android:name=".AdminInitiativesActivity" />
         <activity android:name=".AdminUsersActivity" />
@@ -77,6 +87,17 @@
         <activity android:name=".AddServiceActivity" />
         <activity android:name=".EditServiceActivity" />
         <activity android:name=".ServiceDetailsActivity" />
+
+        <!-- Initiative & Initiator Activities -->
+        <activity android:name=".CreateInitiativeActivity" />
+        <activity android:name=".InitiativesListActivity" />
+        <activity android:name=".InitiativeDetailsActivity" />
+        <activity android:name=".InitiativesImpactActivity" />
+        <activity android:name=".InitiatorDashboardActivity" />
+        <activity android:name=".ProfileInitiatorsActivity" />
+        <activity android:name=".SettingsInitiatorsActivity" />
+        <activity android:name=".NeedMapActivity" />
+        <activity android:name=".UserNotificationActivity" />
 
         <!-- الأنشطة الإضافية -->
         <activity android:name=".Profile" />

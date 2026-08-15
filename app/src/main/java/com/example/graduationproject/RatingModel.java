@@ -10,7 +10,7 @@ public class RatingModel {
     private String customerId;
 
     @SerializedName("provider_id")
-    private Integer providerId;
+    private String providerId;
 
     @SerializedName("rating")
     private int rating;
@@ -18,7 +18,9 @@ public class RatingModel {
     @SerializedName("comment")
     private String comment;
 
-    public RatingModel(String orderId, String customerId, Integer providerId, int rating, String comment) {
+    public RatingModel() {}
+
+    public RatingModel(String orderId, String customerId, String providerId, int rating, String comment) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.providerId = providerId;
@@ -31,8 +33,8 @@ public class RatingModel {
     public void setOrderId(String orderId) { this.orderId = orderId; }
     public String getCustomerId() { return customerId; }
     public void setCustomerId(String customerId) { this.customerId = customerId; }
-    public Integer getProviderId() { return providerId; }
-    public void setProviderId(Integer providerId) { this.providerId = providerId; }
+    public String getProviderId() { return providerId; }
+    public void setProviderId(String providerId) { this.providerId = providerId; }
     public int getRating() { return rating; }
     public void setRating(int rating) { this.rating = rating; }
     public String getComment() { return comment; }

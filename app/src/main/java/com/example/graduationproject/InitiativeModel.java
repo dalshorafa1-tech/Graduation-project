@@ -1,39 +1,77 @@
 package com.example.graduationproject;
 
-import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.ServerTimestamp;
+import java.util.Date;
 
 public class InitiativeModel {
     private String id;
+    private String initiatorId;
     private String title;
-    private String description;
-    private int progress;
-    private String target;
-    private String status;
-    private Timestamp createdAt;
+    private String location;
+    private int targetLiters;
+    private int currentLiters;
+    private String fundingType;
+    private String providerName;
+    private double estimatedCost;
+    private String status; // مثلاً: "نشط"، "مكتمل"، "قيد المراجعة"
+
+    @ServerTimestamp
+    private Date createdAt;
 
     public InitiativeModel() {}
 
-    public InitiativeModel(String id, String title, String description, int progress, String target, String status) {
+    public InitiativeModel(String id, String title, String location, int targetLiters, 
+                           int currentLiters, String status) {
         this.id = id;
         this.title = title;
-        this.description = description;
-        this.progress = progress;
-        this.target = target;
+        this.location = location;
+        this.targetLiters = targetLiters;
+        this.currentLiters = currentLiters;
         this.status = status;
     }
 
+    public InitiativeModel(String id, String initiatorId, String title, String location, int targetLiters, 
+                           int currentLiters, String fundingType, String providerName, 
+                           double estimatedCost, String status) {
+        this.id = id;
+        this.initiatorId = initiatorId;
+        this.title = title;
+        this.location = location;
+        this.targetLiters = targetLiters;
+        this.currentLiters = currentLiters;
+        this.fundingType = fundingType;
+        this.providerName = providerName;
+        this.estimatedCost = estimatedCost;
+        this.status = status;
+    }
+
+    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+    public String getInitiatorId() { return initiatorId; }
+    public void setInitiatorId(String initiatorId) { this.initiatorId = initiatorId; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public int getProgress() { return progress; }
-    public void setProgress(int progress) { this.progress = progress; }
-    public String getTarget() { return target; }
-    public void setTarget(String target) { this.target = target; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    public int getTargetLiters() { return targetLiters; }
+    public void setTargetLiters(int targetLiters) { this.targetLiters = targetLiters; }
+    public int getCurrentLiters() { return currentLiters; }
+    public void setCurrentLiters(int currentLiters) { this.currentLiters = currentLiters; }
+    public String getFundingType() { return fundingType; }
+    public void setFundingType(String fundingType) { this.fundingType = fundingType; }
+    public String getProviderName() { return providerName; }
+    public void setProviderName(String providerName) { this.providerName = providerName; }
+    public double getEstimatedCost() { return estimatedCost; }
+    public void setEstimatedCost(double estimatedCost) { this.estimatedCost = estimatedCost; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-    public Timestamp getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
+    public int getProgressPercentage() {
+        if (targetLiters <= 0) return 0;
+        return (int) (((float) currentLiters / targetLiters) * 100);
+    }
 }

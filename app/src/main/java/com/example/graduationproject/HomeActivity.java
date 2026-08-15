@@ -70,10 +70,6 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        findViewById(R.id.navWallet).setOnClickListener(v -> {
-             startActivity(new Intent(this, WalletActivity.class));
-        });
-
         findViewById(R.id.navOrders).setOnClickListener(v -> {
              startActivity(new Intent(this, My_Orders_Activity.class));
         });

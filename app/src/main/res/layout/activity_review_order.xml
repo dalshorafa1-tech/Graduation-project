@@ -221,10 +221,6 @@
                 <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/user" app:tint="#94A3B8" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="حسابي" android:textColor="#94A3B8" android:textSize="11sp" />
             </LinearLayout>
-            <LinearLayout android:id="@+id/navWallet" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true">
-                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/wallet" app:tint="#94A3B8" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="المحفظة" android:textColor="#94A3B8" android:textSize="11sp" />
-            </LinearLayout>
             <LinearLayout android:id="@+id/navOrders" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true">
                 <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/personal" app:tint="#94A3B8" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="طلباتي" android:textColor="#94A3B8" android:textSize="11sp" />

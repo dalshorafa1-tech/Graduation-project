@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class AdminInitiativesActivity extends AppCompatActivity {
+public class AdminInitiativesActivity extends AppCompatActivity implements AdminInitiativesAdapter.OnInitiativeActionListener {
 
     private static final String TAG = "AdminInitiatives";
     private FirebaseFirestore db;
@@ -56,7 +56,7 @@ public class AdminInitiativesActivity extends AppCompatActivity {
         rvInitiatives.setLayoutManager(new LinearLayoutManager(this));
         rvCitizenNeeds.setLayoutManager(new LinearLayoutManager(this));
 
-        initiativesAdapter = new AdminInitiativesAdapter(initiativeList);
+        initiativesAdapter = new AdminInitiativesAdapter(initiativeList, this);
         needsAdapter = new CitizenNeedsAdapter(needsList);
 
         rvInitiatives.setAdapter(initiativesAdapter);
@@ -175,5 +175,21 @@ public class AdminInitiativesActivity extends AppCompatActivity {
                         needsAdapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    @Override
+    public void onApprove(InitiativeModel initiative) {
+        db.collection("initiatives").document(initiative.getId())
+                .update("status", "نشط")
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "تمت الموافقة على المبادرة بنجاح", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "فشل في الموافقة: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    public void onReject(InitiativeModel initiative) {
+        db.collection("initiatives").document(initiative.getId())
+                .update("status", "مرفوض")
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "تم رفض المبادرة", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "فشل في الرفض: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }

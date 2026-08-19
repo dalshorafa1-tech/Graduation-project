@@ -121,7 +121,7 @@
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_water_drop"
+                                android:src="@drawable/water"
                                 app:tint="#FFFFFF" />
                         </com.google.android.material.card.MaterialCardView>
 
@@ -380,7 +380,6 @@
                     </RelativeLayout>
                     <View
                         android:layout_width="match_parent"
-                        android:height="1dp"
                         android:layout_height="1dp"
                         android:background="#F1F5F9"
                         android:layout_marginTop="12dp"
@@ -419,29 +418,26 @@
             android:id="@+id/nav_home"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_weight="1"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:focusable="true">
             <LinearLayout
-                android:layout_width="85dp"
-                android:layout_height="56dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:paddingVertical="6dp">
+                android:gravity="center">
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:src="@drawable/home"
-                    app:tint="#0069B4" />
+                    app:tint="#94A3B8" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="لوحة التحكم"
-                    android:textColor="#0069B4"
+                    android:textColor="#94A3B8"
                     android:textSize="11sp"
-                    android:textStyle="bold"
                     android:layout_marginTop="3dp" />
             </LinearLayout>
         </LinearLayout>
@@ -449,9 +445,8 @@
         <LinearLayout
             android:id="@+id/nav_initiatives"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@drawable/bg_active_nav_badge"
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
@@ -460,26 +455,26 @@
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:src="@drawable/personal"
-                app:tint="#94A3B8" />
+                app:tint="#0069B4" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="المبادرات"
-                android:textColor="#94A3B8"
+                android:textColor="#0069B4"
                 android:textSize="11sp"
+                android:textStyle="bold"
                 android:layout_marginTop="4dp" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/nav_map"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:focusable="true">
             <ImageView
                 android:layout_width="22dp"
                 android:layout_height="22dp"
@@ -489,30 +484,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="خريطة الاحتياج"
-                android:textColor="#94A3B8"
-                android:textSize="11sp"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_wallet"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground">
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/wallet"
-                app:tint="#94A3B8" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="المحفظة"
                 android:textColor="#94A3B8"
                 android:textSize="11sp"
                 android:layout_marginTop="4dp" />

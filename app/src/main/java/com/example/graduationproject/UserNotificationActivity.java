@@ -34,10 +34,10 @@ public class UserNotificationActivity extends AppCompatActivity {
     private MaterialCardView btnReadAll;
     private View unreadIndicator;
 
-    private TextView filterAll, filterNewOrders, filterRatings, filterPayments;
+    private TextView filterAll, filterNewOrders, filterRatings;
     private View filterActiveBg;
 
-    private LinearLayout navDashboard, navInitiatives, navMap, navWallet;
+    private LinearLayout navDashboard, navInitiatives, navMap;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -79,19 +79,16 @@ public class UserNotificationActivity extends AppCompatActivity {
         filterAll = findViewById(R.id.filterAll);
         filterNewOrders = findViewById(R.id.filterNewOrders);
         filterRatings = findViewById(R.id.filterRatings);
-        filterPayments = findViewById(R.id.filterPayments);
 
         if (filterAll != null) filterAll.setOnClickListener(v -> setActiveFilter(filterAll, "all"));
         if (filterNewOrders != null) filterNewOrders.setOnClickListener(v -> setActiveFilter(filterNewOrders, "new_order"));
         if (filterRatings != null) filterRatings.setOnClickListener(v -> setActiveFilter(filterRatings, "rating"));
-        if (filterPayments != null) filterPayments.setOnClickListener(v -> setActiveFilter(filterPayments, "payment"));
 
         filterActiveBg = filterAll;
 
         navDashboard = findViewById(R.id.nav_dashboard);
         navInitiatives = findViewById(R.id.nav_initiatives);
         navMap = findViewById(R.id.nav_map);
-        navWallet = findViewById(R.id.nav_wallet);
     }
 
     private void setupClickListeners() {
@@ -266,14 +263,6 @@ public class UserNotificationActivity extends AppCompatActivity {
         if (navMap != null) {
             navMap.setOnClickListener(v -> {
                 Intent intent = new Intent(this, NeedMapActivity.class);
-                startActivity(intent);
-                finish();
-            });
-        }
-
-        if (navWallet != null) {
-            navWallet.setOnClickListener(v -> {
-                Intent intent = new Intent(this, WalletActivity.class);
                 startActivity(intent);
                 finish();
             });

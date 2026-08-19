@@ -3,6 +3,7 @@ package com.example.graduationproject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,7 +52,7 @@ public class Group_Order_Activity extends AppCompatActivity implements OnMapRead
         LinearLayout btnAddNeighbor = findViewById(R.id.btnAddNeighborClick);
         mapViewLocation = findViewById(R.id.mapViewLocation);
         etLocationDescription = findViewById(R.id.etLocationDescription);
-        android.view.View btnSubmit = findViewById(R.id.btnSubmitOrder);
+        View btnSubmit = findViewById(R.id.btnSubmitOrder);
 
         btnBack.setOnClickListener(v -> finish());
 
@@ -97,14 +98,23 @@ public class Group_Order_Activity extends AppCompatActivity implements OnMapRead
     }
 
     private void setupBottomNavigation() {
-        findViewById(R.id.navHome).setOnClickListener(v -> {
-            Intent intent = new Intent(this, MapExplorerActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
-        findViewById(R.id.navWallet).setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
-        findViewById(R.id.navOrders).setOnClickListener(v -> startActivity(new Intent(this, My_Orders_Activity.class)));
-        findViewById(R.id.navProfile).setOnClickListener(v -> startActivity(new Intent(this, HomeActivity.class)));
+        View navHome = findViewById(R.id.navHome);
+        View navOrders = findViewById(R.id.navOrders);
+        View navProfile = findViewById(R.id.navProfile);
+
+        if (navHome != null) {
+            navHome.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MapExplorerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            });
+        }
+        if (navOrders != null) {
+            navOrders.setOnClickListener(v -> startActivity(new Intent(this, My_Orders_Activity.class)));
+        }
+        if (navProfile != null) {
+            navProfile.setOnClickListener(v -> startActivity(new Intent(this, Profile.class)));
+        }
     }
 
     private void showAddNeighborDialog() {

@@ -8,6 +8,8 @@ public class InitiativeModel {
     private String initiatorId;
     private String title;
     private String location;
+    private double latitude;
+    private double longitude;
     private int targetLiters;
     private int currentLiters;
     private String fundingType;
@@ -30,13 +32,16 @@ public class InitiativeModel {
         this.status = status;
     }
 
-    public InitiativeModel(String id, String initiatorId, String title, String location, int targetLiters, 
+    public InitiativeModel(String id, String initiatorId, String title, String location, 
+                           double latitude, double longitude, int targetLiters, 
                            int currentLiters, String fundingType, String providerName, 
                            double estimatedCost, String status) {
         this.id = id;
         this.initiatorId = initiatorId;
         this.title = title;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.targetLiters = targetLiters;
         this.currentLiters = currentLiters;
         this.fundingType = fundingType;
@@ -54,6 +59,10 @@ public class InitiativeModel {
     public void setTitle(String title) { this.title = title; }
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
+    public double getLatitude() { return latitude; }
+    public void setLatitude(double latitude) { this.latitude = latitude; }
+    public double getLongitude() { return longitude; }
+    public void setLongitude(double longitude) { this.longitude = longitude; }
     public int getTargetLiters() { return targetLiters; }
     public void setTargetLiters(int targetLiters) { this.targetLiters = targetLiters; }
     public int getCurrentLiters() { return currentLiters; }

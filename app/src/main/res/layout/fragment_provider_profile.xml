@@ -307,16 +307,15 @@
             android:id="@+id/nav_dashboard"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_weight="1"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center">
             <LinearLayout
-                android:layout_width="85dp"
-                android:layout_height="56dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:paddingVertical="6dp">
+                android:gravity="center">
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
@@ -374,29 +373,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="خريطة الاحتياج"
-                android:textColor="#94A3B8"
-                android:textSize="11sp"
-                android:layout_marginTop="4dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/nav_wallet"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center">
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/wallet"
-                app:tint="#94A3B8" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="المحفظة"
                 android:textColor="#94A3B8"
                 android:textSize="11sp"
                 android:layout_marginTop="4dp" />

@@ -251,15 +251,15 @@
             android:gravity="center">
             <LinearLayout android:id="@+id/navProfile" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
                 <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/user" app:tint="#94A3B8" />
-            </LinearLayout>
-            <LinearLayout android:id="@+id/navWallet" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/wallet" app:tint="#94A3B8" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="حسابي" android:textColor="#94A3B8" android:textSize="10sp" />
             </LinearLayout>
             <LinearLayout android:id="@+id/navOrders" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
                 <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/personal" app:tint="#0069B4" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="طلباتي" android:textColor="#0069B4" android:textSize="10sp" />
             </LinearLayout>
             <LinearLayout android:id="@+id/navHome" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
                 <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/home" app:tint="#94A3B8" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="الرئيسية" android:textColor="#94A3B8" android:textSize="10sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

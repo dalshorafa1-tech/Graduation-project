@@ -289,18 +289,22 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
 
         btnSubmitInitiative.setEnabled(false);
 
-        // تم تغيير الحالة لتصبح "قيد المراجعة" بدلاً من "نشط"
+        double lat = (selectedLatLng != null) ? selectedLatLng.getLatitude() : 0;
+        double lng = (selectedLatLng != null) ? selectedLatLng.getLongitude() : 0;
+
         InitiativeModel initiative = new InitiativeModel(
                 null, 
                 currentUser.getUid(),
                 title,
                 location,
+                lat,
+                lng,
                 targetLiters,
                 0,
                 selectedFundingType,
                 selectedProvider,
                 currentEstimatedCost,
-                "قيد المراجعة"
+                "قيد المراجعة" // تعيين الحالة إلى "قيد المراجعة" بدلاً من "نشط"
         );
 
         db.collection("initiatives")
@@ -309,7 +313,7 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
                     String docId = documentReference.getId();
                     db.collection("initiatives").document(docId).update("id", docId);
                     
-                    Toast.makeText(this, "✅ تم إرسال طلب المبادرة للمراجعة!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "✅ تم إرسال المبادرة للمراجعة من قبل الإدارة", Toast.LENGTH_LONG).show();
                     
                     Intent intent = new Intent(this, InitiativesListActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -53,7 +53,6 @@ public class ProfileInitiatorsActivity extends AppCompatActivity {
         navDashboard = findViewById(R.id.nav_dashboard);
         navInitiatives = findViewById(R.id.nav_initiatives);
         navMap = findViewById(R.id.nav_map);
-        navWallet = findViewById(R.id.nav_wallet);
     }
 
     //  جلب ومراقبة بيانات المستخدم بشكل حي (Realtime Listener) مع دعم كافة الكولكشنز المحتملة

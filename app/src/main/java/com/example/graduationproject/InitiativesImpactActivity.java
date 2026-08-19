@@ -15,7 +15,7 @@ public class InitiativesImpactActivity extends AppCompatActivity {
     private ImageView btnBack;
     private TextView btnFilter;
     private MaterialCardView cardCompleted1, cardCompleted2;
-    private LinearLayout navHome, navInitiatives, navMap, navWallet;
+    private LinearLayout navHome, navInitiatives, navMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,6 @@ public class InitiativesImpactActivity extends AppCompatActivity {
         navHome = findViewById(R.id.nav_home);
         navInitiatives = findViewById(R.id.nav_initiatives);
         navMap = findViewById(R.id.nav_map);
-        navWallet = findViewById(R.id.nav_wallet);
     }
 
     private void setupClickListeners() {
@@ -63,7 +62,6 @@ public class InitiativesImpactActivity extends AppCompatActivity {
         // أزرار التنقل السفلية
         navHome.setOnClickListener(v -> Toast.makeText(this, "العودة للوحة القيادة", Toast.LENGTH_SHORT).show());
         navMap.setOnClickListener(v -> Toast.makeText(this, "الانتقال لخريطة الاحتياج المائي الميدانية", Toast.LENGTH_SHORT).show());
-        navWallet.setOnClickListener(v -> Toast.makeText(this, "الانتقال للمحفظة المالية والتقارير", Toast.LENGTH_SHORT).show());
     }
 
     /**

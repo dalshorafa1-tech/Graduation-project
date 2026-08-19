@@ -26,7 +26,7 @@ public class InitiativesListActivity extends AppCompatActivity {
     private TabLayout tabLayoutInitiatives;
     private RecyclerView rvInitiatives;
     private FloatingActionButton fabAddInitiative;
-    private LinearLayout navDashboard, navInitiatives, navMap, navWallet;
+    private LinearLayout navDashboard, navInitiatives, navMap;
     private InitiativesAdapter adapter;
     private List<InitiativeModel> activeInitiativesList = new ArrayList<>();
     private List<InitiativeModel> completedInitiativesList = new ArrayList<>();
@@ -52,7 +52,6 @@ public class InitiativesListActivity extends AppCompatActivity {
         navDashboard = findViewById(R.id.nav_dashboard);
         navInitiatives = findViewById(R.id.nav_initiatives);
         navMap = findViewById(R.id.nav_map);
-        navWallet = findViewById(R.id.nav_wallet);
     }
 
     private void setupRecyclerView() {
@@ -137,11 +136,6 @@ public class InitiativesListActivity extends AppCompatActivity {
 
         navMap.setOnClickListener(v -> {
             Intent intent = new Intent(this, MapExplorerActivity.class);
-            startActivity(intent);
-        });
-
-        navWallet.setOnClickListener(v -> {
-            Intent intent = new Intent(this, WalletActivity.class);
             startActivity(intent);
         });
     }

@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://tools.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8FAFC"
@@ -103,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="تابع حالة طلبات المياه وتحديثات حسابك ومحفظتك"
+                android:text="تابع حالة طلبات المياه وتحديثات حسابك"
                 android:textColor="#64748B"
                 android:textSize="13sp" />
 
@@ -155,20 +155,6 @@
                         android:text="التقييمات"
                         android:textColor="#475569"
                         android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/filterPayments"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:layout_marginLeft="8dp"
-                        android:background="@drawable/bg_filter_inactive"
-                        android:gravity="center"
-                        android:paddingHorizontal="16dp"
-                        android:text="المحفظة"
-                        android:textColor="#475569"
-                        android:textSize="13sp" />
-
-
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -189,8 +175,6 @@
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_notification" />
 
-            <!-- إبقاء البطاقات القديمة كنموذج (اختياري) أو حذفها، هنا سنحذفها لتوفير مساحة للـ RecyclerView -->
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -208,15 +192,14 @@
             android:id="@+id/nav_dashboard"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_weight="1"
             android:gravity="center">
 
             <LinearLayout
-                android:layout_width="85dp"
-                android:layout_height="56dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:paddingVertical="6dp">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="22dp"
@@ -253,7 +236,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="لمبادرات"
+                android:text="المبادرات"
                 android:textColor="#94A3B8"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -281,32 +264,8 @@
                 android:textSize="11sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/nav_wallet"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/wallet"
-                app:tint="#94A3B8" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="المحفظة "
-                android:textColor="#94A3B8"
-                android:textSize="11sp" />
-        </LinearLayout>
-
     </LinearLayout>
 
-    <!-- إضافة unreadIndicator عام إذا كان النشاط يحتاجه -->
     <View
         android:id="@+id/unreadIndicator"
         android:layout_width="8dp"

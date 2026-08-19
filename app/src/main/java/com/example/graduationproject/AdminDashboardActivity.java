@@ -2,25 +2,80 @@ package com.example.graduationproject;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 public class AdminDashboardActivity extends AppCompatActivity {
+    private static final String TAG = "AdminDashboard";
+
+    private FrameLayout flNotifications;
+    private TextView tvNotificationBadge;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+    private ListenerRegistration notificationsListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
 
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
+        initViews();
         setupClickListeners();
+        listenForNotifications();
+    }
+
+    private void initViews() {
+        flNotifications = findViewById(R.id.flNotifications);
+        tvNotificationBadge = findViewById(R.id.tvNotificationBadge);
+    }
+
+    private void listenForNotifications() {
+        // للمسؤول، قد نرغب في رؤية كل الإشعارات الإدارية أو الخاصة به
+        // هنا نفترض وجود إشعارات موجهة للمسؤول (مثلاً إشعارات النظام)
+        if (mAuth.getCurrentUser() == null) return;
+
+        notificationsListener = db.collection("notifications")
+                .whereEqualTo("userId", mAuth.getCurrentUser().getUid())
+                .whereEqualTo("read", false)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen for notifications failed.", e);
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        int count = snapshots.size();
+                        if (count > 0) {
+                            tvNotificationBadge.setText(String.valueOf(count));
+                            tvNotificationBadge.setVisibility(View.VISIBLE);
+                        } else {
+                            tvNotificationBadge.setVisibility(View.GONE);
+                        }
+                    }
+                });
     }
 
     private void setupClickListeners() {
+        if (flNotifications != null) {
+            flNotifications.setOnClickListener(v -> {
+                // نفتح واجهة الإشعارات (المشتركة أو مخصصة للأدمن)
+                startActivity(new Intent(this, UserNotificationActivity.class));
+            });
+        }
+
         // إدارة المستخدمين
         View cardUsers = findViewById(R.id.cardManageUsers);
         if (cardUsers != null) {
@@ -31,7 +86,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         // إدارة المزودين
         findViewById(R.id.cardManageProviders).setOnClickListener(v -> {
-            // يمكننا فتح واجهة المستخدمين مع فلتر للمزودين أو واجهة مخصصة
             Intent intent = new Intent(this, AdminUsersActivity.class);
             intent.putExtra("filter_role", "provider");
             startActivity(intent);
@@ -44,7 +98,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         // إدارة الطلبات
         findViewById(R.id.cardManageOrders).setOnClickListener(v -> {
-            // افترضنا وجود نشاط لإدارة جميع الطلبات
             Toast.makeText(this, "واجهة إدارة الطلبات قيد التطوير", Toast.LENGTH_SHORT).show();
         });
 
@@ -61,5 +114,13 @@ public class AdminDashboardActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (notificationsListener != null) {
+            notificationsListener.remove();
+        }
     }
 }

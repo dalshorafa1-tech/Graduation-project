@@ -11,12 +11,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
+
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -25,7 +29,8 @@ import java.util.Locale;
 public class InitiativeDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "InitiativeDetails";
 
-    private GoogleMap mBoundedMap;
+    private MapView mapView;
+    private MapboxMap mBoundedMap;
     private TextView tvShowRoute;
     private com.google.android.material.card.MaterialCardView btnContactProvider;
     private LinearLayout navDashboard, navInitiatives, navNeedMap;
@@ -46,6 +51,10 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Initialize Mapbox before layout inflation
+        Mapbox.getInstance(this);
+        
         setContentView(R.layout.activity_initiative_details);
 
         db = FirebaseFirestore.getInstance();
@@ -58,10 +67,10 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
         setupClickListeners();
         fetchInitiativeDetails();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map_initiative_details);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
+        mapView = findViewById(R.id.mapview_initiative_details);
+        if (mapView != null) {
+            mapView.onCreate(savedInstanceState);
+            mapView.getMapAsync(this);
         }
     }
 
@@ -115,7 +124,18 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
     private void displayData(InitiativeModel initiative) {
         tvInitiativeTitle.setText(initiative.getTitle());
         tvInitiativeLocation.setText("📍 نقطة التوزيع: " + initiative.getLocation());
-        tvInitiativeId.setText("رقم المبادرة: #" + (initiative.getId() != null ? initiative.getId().substring(0, 5).toUpperCase() : "---"));
+        
+        String rawId = initiative.getId();
+        String displayId = "---";
+        if (rawId != null) {
+            if (rawId.length() >= 5) {
+                displayId = rawId.substring(0, 5).toUpperCase();
+            } else {
+                displayId = rawId.toUpperCase();
+            }
+        }
+        tvInitiativeId.setText("رقم المبادرة: #" + displayId);
+
         tvWaterAmount.setText(String.format(Locale.getDefault(), "%, d لتر", initiative.getTargetLiters()));
         tvFundingType.setText(initiative.getFundingType());
         tvProviderName.setText(initiative.getProviderName() != null ? initiative.getProviderName() : "لم يحدد بعد");
@@ -155,10 +175,15 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
     }
 
     private void updateMap() {
-        if (mBoundedMap != null) {
+        if (mBoundedMap != null && mBoundedMap.getStyle() != null) {
             mBoundedMap.clear();
             mBoundedMap.addMarker(new MarkerOptions().position(targetLocation).title(locationName));
-            mBoundedMap.moveCamera(CameraUpdateFactory.newLatLngZoom(targetLocation, 14f));
+            mBoundedMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                    new CameraPosition.Builder()
+                            .target(targetLocation)
+                            .zoom(14.0)
+                            .build()
+            ));
         }
     }
 
@@ -186,9 +211,54 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        mBoundedMap = googleMap;
-        updateMap();
-        mBoundedMap.getUiSettings().setScrollGesturesEnabled(false);
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        mBoundedMap = mapboxMap;
+        mapboxMap.setStyle(new Style.Builder().fromUri("https://tiles.openfreemap.org/styles/bright"), style -> {
+            updateMap();
+            mBoundedMap.getUiSettings().setScrollGesturesEnabled(false);
+            mBoundedMap.getUiSettings().setAllGesturesEnabled(false);
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mapView != null) mapView.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mapView != null) mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mapView != null) mapView.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mapView != null) mapView.onStop();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mapView != null) mapView.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mapView != null) mapView.onLowMemory();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mapView != null) mapView.onDestroy();
     }
 }

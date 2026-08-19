@@ -10,8 +10,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -46,21 +45,18 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
 
     private static final String TAG = "CreateInitiative";
 
-    private EditText etTitle, etWaterAmount, etSearchProvider, etLocation;
+    private EditText etTitle, etWaterAmount, etLocation;
     private TextView tvEstimatedCost;
     private MaterialButton btnSubmitInitiative;
 
-    private MaterialButton btn5k, btn10k, btn25k;
-
-    private RadioGroup radioGroupFunding;
-    private RadioButton rbInternalFunding, rbCrowdFunding;
-    private View layoutInternalFunding, layoutCrowdFunding;
-    private String selectedFundingType = "تمويل داخلي / مؤسساتي";
+    private MaterialButtonToggleGroup toggleGroupFunding;
+    private String selectedFundingType = "تمويل مؤسساتي";
 
     private RecyclerView rvProviders;
     private ProvidersSelectableAdapter providersAdapter;
     private List<ProviderModel> providerList = new ArrayList<>();
-    private String selectedProvider = "";
+    private String selectedProviderName = "";
+    private String selectedProviderId = "";
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -90,17 +86,8 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
         etWaterAmount = findViewById(R.id.etWaterAmount);
         tvEstimatedCost = findViewById(R.id.tvEstimatedCost);
         btnSubmitInitiative = findViewById(R.id.btnPublishInitiative);
-        etSearchProvider = findViewById(R.id.etSearchProvider);
 
-        btn5k = findViewById(R.id.btn5k);
-        btn10k = findViewById(R.id.btn10k);
-        btn25k = findViewById(R.id.btn25k);
-
-        radioGroupFunding = findViewById(R.id.radioGroupFunding);
-        rbInternalFunding = findViewById(R.id.rbInternalFunding);
-        rbCrowdFunding = findViewById(R.id.rbCrowdFunding);
-        layoutInternalFunding = findViewById(R.id.layoutInternalFunding);
-        layoutCrowdFunding = findViewById(R.id.layoutCrowdFunding);
+        toggleGroupFunding = findViewById(R.id.toggleGroupFunding);
 
         rvProviders = findViewById(R.id.rvProviders);
 
@@ -113,7 +100,6 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
 
         // إعداد المنطق
         setupWaterAmountInput();
-        setupQuickAmountButtons();
         setupFundingSelection();
         setupProvidersList();
         fetchProvidersFromFirestore();
@@ -127,8 +113,9 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
 
     private void setupProvidersList() {
         providersAdapter = new ProvidersSelectableAdapter(providerList, provider -> {
-            selectedProvider = provider.getBusinessName();
-            Toast.makeText(this, "تم اختيار: " + selectedProvider, Toast.LENGTH_SHORT).show();
+            selectedProviderName = provider.getBusinessName();
+            selectedProviderId = provider.getUserId(); // حفظ معرف المستخدم للمزود
+            Toast.makeText(this, "تم اختيار: " + selectedProviderName, Toast.LENGTH_SHORT).show();
         });
         rvProviders.setLayoutManager(new LinearLayoutManager(this));
         rvProviders.setAdapter(providersAdapter);
@@ -228,21 +215,18 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
         });
     }
 
-    private void setupQuickAmountButtons() {
-        btn5k.setOnClickListener(v -> etWaterAmount.setText("5000"));
-        btn10k.setOnClickListener(v -> etWaterAmount.setText("10000"));
-        btn25k.setOnClickListener(v -> etWaterAmount.setText("25000"));
-    }
-
     private void setupFundingSelection() {
-        layoutInternalFunding.setOnClickListener(v -> {
-            selectedFundingType = "تمويل داخلي / مؤسساتي";
-            rbInternalFunding.setChecked(true);
-        });
-        layoutCrowdFunding.setOnClickListener(v -> {
-            selectedFundingType = "تمويل جماعي / تبرعات";
-            rbCrowdFunding.setChecked(true);
-        });
+        if (toggleGroupFunding != null) {
+            toggleGroupFunding.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+                if (isChecked) {
+                    if (checkedId == R.id.btnInternalFunding) {
+                        selectedFundingType = "تمويل مؤسساتي";
+                    } else if (checkedId == R.id.btnCrowdFunding) {
+                        selectedFundingType = "تمويل جماعي / تبرعات";
+                    }
+                }
+            });
+        }
     }
 
     private void calculateCost() {
@@ -276,7 +260,7 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
             return;
         }
 
-        if (TextUtils.isEmpty(selectedProvider)) {
+        if (TextUtils.isEmpty(selectedProviderId)) {
             Toast.makeText(this, "🔴 يرجى اختيار مزود خدمة", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -302,9 +286,10 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
                 targetLiters,
                 0,
                 selectedFundingType,
-                selectedProvider,
+                selectedProviderName,
+                selectedProviderId, // تمرير معرف المزود
                 currentEstimatedCost,
-                "قيد المراجعة" // تعيين الحالة إلى "قيد المراجعة" بدلاً من "نشط"
+                "قيد المراجعة"
         );
 
         db.collection("initiatives")

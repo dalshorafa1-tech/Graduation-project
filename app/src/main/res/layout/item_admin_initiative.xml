@@ -80,13 +80,17 @@
                 android:textSize="11sp" />
 
             <TextView
+                android:id="@+id/tvViewDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:text="عرض التفاصيل ←"
                 android:textColor="#0069B4"
                 android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"/>
         </RelativeLayout>
 
         <LinearLayout

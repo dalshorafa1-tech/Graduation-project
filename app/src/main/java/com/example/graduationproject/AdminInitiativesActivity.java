@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -181,8 +182,54 @@ public class AdminInitiativesActivity extends AppCompatActivity implements Admin
     public void onApprove(InitiativeModel initiative) {
         db.collection("initiatives").document(initiative.getId())
                 .update("status", "نشط")
-                .addOnSuccessListener(aVoid -> Toast.makeText(this, "تمت الموافقة على المبادرة بنجاح", Toast.LENGTH_SHORT).show())
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "تمت الموافقة على المبادرة بنجاح", Toast.LENGTH_SHORT).show();
+                    sendNotificationToProvider(initiative);
+                    sendNotificationToInitiator(initiative);
+                })
                 .addOnFailureListener(e -> Toast.makeText(this, "فشل في الموافقة: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void sendNotificationToProvider(InitiativeModel initiative) {
+        if (initiative.getProviderId() == null || initiative.getProviderId().isEmpty()) {
+            Log.e(TAG, "Cannot send notification: Provider ID is null or empty");
+            return;
+        }
+
+        NotificationModel notification = new NotificationModel();
+        notification.setProvider_id(initiative.getProviderId());
+        notification.setTitle("مبادرة جديدة معتمدة");
+        notification.setMessage("تم اختيارك لتزويد مبادرة: " + initiative.getTitle() + "\nالكمية المطلوبة: " + initiative.getTargetLiters() + " لتر\nالموقع: " + initiative.getLocation());
+        notification.setType("INITIATIVE_APPROVED");
+        notification.setOrder_id(initiative.getId());
+        notification.setRead(false);
+        notification.setCreated_at(Timestamp.now());
+
+        db.collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(documentReference -> Log.d(TAG, "Notification sent to provider: " + initiative.getProviderId()))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to send notification to provider", e));
+    }
+
+    private void sendNotificationToInitiator(InitiativeModel initiative) {
+        if (initiative.getInitiatorId() == null || initiative.getInitiatorId().isEmpty()) {
+            Log.e(TAG, "Cannot send notification: Initiator ID is null or empty");
+            return;
+        }
+
+        NotificationModel notification = new NotificationModel();
+        notification.setUserId(initiative.getInitiatorId()); // استخدام userId للمبادر
+        notification.setTitle("تم قبول مبادرتك ✅");
+        notification.setMessage("تهانينا! تم قبول مبادرتك: " + initiative.getTitle() + ". هي الآن نشطة ويمكن للمستفيدين رؤيتها.");
+        notification.setType("INITIATIVE_ACCEPTED_INITIATOR");
+        notification.setOrder_id(initiative.getId());
+        notification.setRead(false);
+        notification.setCreated_at(Timestamp.now());
+
+        db.collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(documentReference -> Log.d(TAG, "Notification sent to initiator: " + initiative.getInitiatorId()))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to send notification to initiator", e));
     }
 
     @Override

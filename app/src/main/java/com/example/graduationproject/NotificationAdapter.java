@@ -74,16 +74,24 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         holder.itemView.setOnClickListener(v -> {
             if (!notification.isRead() && notification.getId() != null) {
-                db.collection("notifications").document(notification.getId()).update("is_read", true);
+                // تحديث حالة القراءة في الفايرستور (استخدام "read" للتوافق مع التعديلات السابقة)
+                db.collection("notifications").document(notification.getId()).update("read", true);
                 notification.setRead(true);
                 notifyItemChanged(position);
             }
 
-            // التوجيه الذكي
-            if ("service_status".equals(notification.getType())) {
+            String type = notification.getType();
+            // لا يتم التوجيه لأي واجهة إذا كان الإشعار يخص المبادرات (للمبادر) حسب طلب المستخدم
+            if (type != null && type.contains("INITIATIVE")) {
+                return;
+            }
+
+            // التوجيه الذكي للمزودين فقط
+            if ("service_status".equals(type)) {
                 Intent intent = new Intent(context, ProviderServicesActivity.class);
                 context.startActivity(intent);
-            } else if (notification.getOrder_id() != null) {
+            } else if (notification.getOrder_id() != null && 
+                    ("new_order".equals(type) || "order_update".equals(type))) {
                 Intent intent = new Intent(context, ProviderOrderDetailsActivity.class);
                 intent.putExtra("order_id", notification.getOrder_id());
                 context.startActivity(intent);

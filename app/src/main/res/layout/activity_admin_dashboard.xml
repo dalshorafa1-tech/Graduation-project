@@ -27,6 +27,40 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Notification Icon with Badge -->
+    <FrameLayout
+        android:id="@+id/flNotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="24dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivAdminNotifications"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="4dp"
+            android:src="@drawable/notification"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/tvNotificationBadge"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="top|end"
+            android:background="@drawable/badge_background"
+            android:gravity="center"
+            android:text="0"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"

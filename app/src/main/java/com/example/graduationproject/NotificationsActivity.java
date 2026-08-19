@@ -24,7 +24,7 @@ public class NotificationsActivity extends AppCompatActivity {
 
     private RecyclerView rvNotifications;
     private TextView tvTitle, tvSubtitle;
-    private View btnReadAll; // Changed from TextView to View to avoid ClassCastException
+    private View btnReadAll;
     private TextView filterAll, filterNewOrders, filterRatings, filterPayments;
     private View filterActiveBg;
 
@@ -170,7 +170,7 @@ public class NotificationsActivity extends AppCompatActivity {
     private void markAllAsRead() {
         for (NotificationModel n : notificationList) {
             if (!n.isRead() && n.getId() != null) {
-                db.collection("notifications").document(n.getId()).update("is_read", true);
+                db.collection("notifications").document(n.getId()).update("read", true);
                 n.setRead(true);
             }
         }

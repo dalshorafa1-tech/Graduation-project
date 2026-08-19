@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -24,7 +26,8 @@ import java.util.List;
 public class InitiatorDashboardActivity extends AppCompatActivity {
     private static final String TAG = "DashboardDebug";
 
-    private ImageView btnProfile;
+    private FrameLayout btnNotificationContainer;
+    private TextView tvNotificationBadge;
     private TextView btnViewAll;
     private MaterialCardView btnCreateInitiative;
     private LinearLayout btnExploreMap;
@@ -40,6 +43,7 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private ListenerRegistration notificationsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +59,12 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
         loadUserData();
         fetchInitiativesFromFirebase();
         setupClickListeners();
+        listenForNotifications();
     }
 
     private void initViews() {
-        btnProfile = findViewById(R.id.btnNavNotification);
+        btnNotificationContainer = findViewById(R.id.btnNotificationContainer);
+        tvNotificationBadge = findViewById(R.id.tvNotificationBadge);
         btnViewAll = findViewById(R.id.btnViewAll);
         btnCreateInitiative = findViewById(R.id.btnCreateInitiative);
         btnExploreMap = findViewById(R.id.btnExploreMap);
@@ -73,6 +79,31 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
         navMap = findViewById(R.id.navMap);
         navAdd = findViewById(R.id.navAdd);
         navProfile = findViewById(R.id.navProfile);
+    }
+
+    private void listenForNotifications() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
+
+        notificationsListener = db.collection("notifications")
+                .whereEqualTo("userId", user.getUid())
+                .whereEqualTo("read", false)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen for notifications failed.", e);
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        int count = snapshots.size();
+                        if (count > 0) {
+                            tvNotificationBadge.setText(String.valueOf(count));
+                            tvNotificationBadge.setVisibility(View.VISIBLE);
+                        } else {
+                            tvNotificationBadge.setVisibility(View.GONE);
+                        }
+                    }
+                });
     }
 
     private void loadUserData() {
@@ -222,9 +253,9 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        if (btnProfile != null) {
-            btnProfile.setOnClickListener(v -> {
-                Intent intent = new Intent(this, ProfileInitiatorsActivity.class);
+        if (btnNotificationContainer != null) {
+            btnNotificationContainer.setOnClickListener(v -> {
+                Intent intent = new Intent(this, UserNotificationActivity.class);
                 startActivity(intent);
             });
         }
@@ -248,6 +279,14 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, NeedMapActivity.class);
                 startActivity(intent);
             });
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (notificationsListener != null) {
+            notificationsListener.remove();
         }
     }
 }

@@ -224,12 +224,10 @@
                             android:textStyle="bold"/>
                     </RelativeLayout>
 
-                    <androidx.fragment.app.FragmentContainerView
-                        android:id="@+id/map_initiative_details"
-                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                    <com.mapbox.mapboxsdk.maps.MapView
+                        android:id="@+id/mapview_initiative_details"
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        tools:context=".InitiativeDetailsActivity" />
+                        android:layout_height="180dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -256,7 +254,7 @@
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/provider_img"
                         android:layout_width="48dp"
-                        android:height="48dp"
+                        android:layout_height="48dp"
                         android:layout_below="@id/lbl_provider"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="8dp"

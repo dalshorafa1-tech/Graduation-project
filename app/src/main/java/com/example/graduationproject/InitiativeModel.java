@@ -14,6 +14,7 @@ public class InitiativeModel {
     private int currentLiters;
     private String fundingType;
     private String providerName;
+    private String providerId; // تم إضافة معرف المزود
     private double estimatedCost;
     private String status; // مثلاً: "نشط"، "مكتمل"، "قيد المراجعة"
 
@@ -22,20 +23,10 @@ public class InitiativeModel {
 
     public InitiativeModel() {}
 
-    public InitiativeModel(String id, String title, String location, int targetLiters, 
-                           int currentLiters, String status) {
-        this.id = id;
-        this.title = title;
-        this.location = location;
-        this.targetLiters = targetLiters;
-        this.currentLiters = currentLiters;
-        this.status = status;
-    }
-
     public InitiativeModel(String id, String initiatorId, String title, String location, 
                            double latitude, double longitude, int targetLiters, 
                            int currentLiters, String fundingType, String providerName, 
-                           double estimatedCost, String status) {
+                           String providerId, double estimatedCost, String status) {
         this.id = id;
         this.initiatorId = initiatorId;
         this.title = title;
@@ -46,6 +37,7 @@ public class InitiativeModel {
         this.currentLiters = currentLiters;
         this.fundingType = fundingType;
         this.providerName = providerName;
+        this.providerId = providerId;
         this.estimatedCost = estimatedCost;
         this.status = status;
     }
@@ -71,6 +63,8 @@ public class InitiativeModel {
     public void setFundingType(String fundingType) { this.fundingType = fundingType; }
     public String getProviderName() { return providerName; }
     public void setProviderName(String providerName) { this.providerName = providerName; }
+    public String getProviderId() { return providerId; }
+    public void setProviderId(String providerId) { this.providerId = providerId; }
     public double getEstimatedCost() { return estimatedCost; }
     public void setEstimatedCost(double estimatedCost) { this.estimatedCost = estimatedCost; }
     public String getStatus() { return status; }

@@ -1,5 +1,6 @@
 package com.example.graduationproject;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +60,13 @@ public class AdminInitiativesAdapter extends RecyclerView.Adapter<AdminInitiativ
         holder.btnReject.setOnClickListener(v -> {
             if (listener != null) listener.onReject(initiative);
         });
+
+        // الانتقال لواجهة تفاصيل المبادرة عند النقر على "عرض التفاصيل"
+        holder.tvViewDetails.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), InitiativeDetailsActivity.class);
+            intent.putExtra("initiative_id", initiative.getId());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -67,7 +75,7 @@ public class AdminInitiativesAdapter extends RecyclerView.Adapter<AdminInitiativ
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitle, tvTarget, tvStatus, tvProgressPercent;
+        TextView tvTitle, tvTarget, tvStatus, tvProgressPercent, tvViewDetails;
         ProgressBar pbProgress;
         View layoutActions;
         MaterialButton btnApprove, btnReject;
@@ -78,6 +86,7 @@ public class AdminInitiativesAdapter extends RecyclerView.Adapter<AdminInitiativ
             tvTarget = itemView.findViewById(R.id.tvInitiativeTarget);
             tvStatus = itemView.findViewById(R.id.tvInitiativeStatus);
             tvProgressPercent = itemView.findViewById(R.id.tvProgressPercent);
+            tvViewDetails = itemView.findViewById(R.id.tvViewDetails);
             pbProgress = itemView.findViewById(R.id.pbInitiativeProgress);
             layoutActions = itemView.findViewById(R.id.layoutActions);
             btnApprove = itemView.findViewById(R.id.btnApproveInitiative);

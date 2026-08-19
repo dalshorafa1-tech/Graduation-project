@@ -51,6 +51,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- بطاقة ترحيبية -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -58,13 +59,11 @@
                 app:cardBackgroundColor="#0069B4"
                 app:cardCornerRadius="16dp"
                 app:strokeWidth="0dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="24dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -72,7 +71,6 @@
                         android:textColor="#FFFFFF"
                         android:textSize="22sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -84,6 +82,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- اسم المبادرة -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,7 +101,6 @@
                 app:strokeColor="#CBD5E1"
                 app:strokeWidth="1dp"
                 app:cardElevation="0dp">
-
                 <EditText
                     android:id="@+id/etInitiativeName"
                     android:layout_width="match_parent"
@@ -116,6 +114,7 @@
                     android:inputType="text" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- الخريطة والحي -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -132,7 +131,6 @@
                 app:cardCornerRadius="16dp"
                 app:strokeColor="#0069B4"
                 app:strokeWidth="1dp">
-
                 <com.mapbox.mapboxsdk.maps.MapView
                     android:id="@+id/mapview"
                     android:layout_width="match_parent"
@@ -146,7 +144,6 @@
                 app:cardBackgroundColor="#F1F5F9"
                 app:cardCornerRadius="12dp"
                 app:strokeWidth="0dp">
-
                 <EditText
                     android:id="@+id/spinner_target_district"
                     android:layout_width="match_parent"
@@ -160,6 +157,7 @@
                     android:clickable="false" />
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- اختيار المزود -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -169,38 +167,6 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="#F1F5F9"
-                app:cardCornerRadius="20dp"
-                app:strokeWidth="0dp"
-                app:cardElevation="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="14dp">
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@android:drawable/ic_menu_search"
-                        app:tint="#94A3B8"/>
-                    <EditText
-                        android:id="@+id/etSearchProvider"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent"
-                        android:hint="بحث عن مزود..."
-                        android:textSize="13sp"
-                        android:textColorHint="#94A3B8"
-                        android:paddingHorizontal="8dp"
-                        android:inputType="text"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvProviders"
                 android:layout_width="match_parent"
@@ -209,6 +175,7 @@
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_provider_selectable" />
 
+            <!-- الكمية -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -221,7 +188,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:strokeColor="#E2E8F0"
@@ -241,7 +208,6 @@
                         android:textColor="#0069B4"
                         android:textStyle="bold"
                         android:textSize="16sp"/>
-
                     <EditText
                         android:id="@+id/etWaterAmount"
                         android:layout_width="match_parent"
@@ -258,191 +224,62 @@
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn25k"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="25,000 لتر"
-                    android:textSize="11sp"
-                    android:textColor="#475569"
-                    app:backgroundTint="#F1F5F9"
-                    app:cornerRadius="8dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn10k"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="4dp"
-                    android:text="10,000 لتر"
-                    android:textSize="11sp"
-                    android:textColor="#475569"
-                    app:backgroundTint="#F1F5F9"
-                    app:cornerRadius="8dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn5k"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginHorizontal="4dp"
-                    android:text="5,000 لتر"
-                    android:textSize="11sp"
-                    android:textColor="#475569"
-                    app:backgroundTint="#F1F5F9"
-                    app:cornerRadius="8dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"/>
-            </LinearLayout>
-
+            <!-- خيارات التمويل المحدثة (مجموعة أزرار تبديل) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="تمويل المبادرة"
-                android:textColor="#475569"
+                android:text="مصدر تمويل المبادرة"
+                android:textColor="#094A74"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="12dp" />
 
-            <com.google.android.material.card.MaterialCardView
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleGroupFunding"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="12dp"
-                app:strokeColor="#E2E8F0"
-                app:strokeWidth="1dp"
-                app:cardElevation="0dp">
+                android:layout_marginBottom="24dp"
+                app:singleSelection="true"
+                app:selectionRequired="true">
 
-                <RadioGroup
-                    android:id="@+id/radioGroupFunding"
-                    android:layout_width="match_parent"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnInternalFunding"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="4dp">
+                    android:layout_weight="1"
+                    android:text="تمويل مؤسساتي"
+                    android:textSize="12sp"
+                    app:icon="@drawable/home"
+                    android:paddingVertical="12dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
 
-                    <RelativeLayout
-                        android:id="@+id/layoutInternalFunding"
-                        android:layout_width="match_parent"
-                        android:layout_height="54dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="12dp">
-                        <ImageView
-                            android:id="@+id/iconWallet"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/home"
-                            app:tint="#0069B4"/>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_toEndOf="@id/iconWallet"
-                            android:layout_marginStart="10dp"
-                            android:layout_centerVertical="true">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="تمويل داخلي / مؤسساتي"
-                                android:textColor="#1E293B"
-                                android:textSize="13sp"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="رصيد حساب المنظمة الحالي"
-                                android:textColor="#94A3B8"
-                                android:textSize="10sp"/>
-                        </LinearLayout>
-                        <RadioButton
-                            android:id="@+id/rbInternalFunding"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:checked="true"
-                            android:buttonTint="#0069B4"/>
-                    </RelativeLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCrowdFunding"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="تمويل جماعي"
+                    android:textSize="12sp"
+                    app:icon="@drawable/user"
+                    android:paddingVertical="12dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#F1F5F9"/>
-
-                    <RelativeLayout
-                        android:id="@+id/layoutCrowdFunding"
-                        android:layout_width="match_parent"
-                        android:layout_height="54dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="12dp">
-                        <ImageView
-                            android:id="@+id/iconCrowd"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/user"
-                            app:tint="#64748B"/>
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_toEndOf="@id/iconCrowd"
-                            android:layout_marginStart="10dp"
-                            android:layout_centerVertical="true">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="تمويل جماعي / تبرعات"
-                                android:textColor="#1E293B"
-                                android:textSize="13sp"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="فتح باب التبرع للعموم"
-                                android:textColor="#94A3B8"
-                                android:textSize="10sp"/>
-                        </LinearLayout>
-                        <RadioButton
-                            android:id="@+id/rbCrowdFunding"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:buttonTint="#0069B4"/>
-                    </RelativeLayout>
-                </RadioGroup>
-            </com.google.android.material.card.MaterialCardView>
-
+            <!-- التكلفة -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="4dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:text="التكلفة التقديرية"
+                    android:text="التكلفة التقديرية الكلية"
                     android:textColor="#64748B"
                     android:textSize="12sp"/>
                 <TextView
@@ -453,7 +290,7 @@
                     android:text="0.00 ILS"
                     android:textColor="#0069B4"
                     android:textStyle="bold"
-                    android:textSize="13sp"/>
+                    android:textSize="15sp"/>
             </RelativeLayout>
 
         </LinearLayout>
@@ -473,7 +310,7 @@
             android:id="@+id/btnPublishInitiative"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="بدء المبادرة الآن"
+            android:text="إرسال المبادرة للمراجعة"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold"

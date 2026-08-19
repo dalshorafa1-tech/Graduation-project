@@ -40,11 +40,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:clickable="true"
-                android:focusable="true">
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp">
                 <ImageView
                     android:id="@+id/ivNotificationIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
                     android:src="@drawable/notification"
                     app:tint="#64748B" />
                 <TextView
@@ -52,9 +54,9 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_alignRight="@id/ivNotificationIcon"
-                    android:layout_marginRight="-6dp"
-                    android:layout_marginTop="-6dp"
-                    android:background="@drawable/bg_circle_active"
+                    android:layout_marginRight="-4dp"
+                    android:layout_marginTop="-4dp"
+                    android:background="@drawable/badge_background"
                     android:gravity="center"
                     android:text="0"
                     android:textColor="#FFFFFF"

@@ -49,6 +49,7 @@ public class ProviderDashboardActivity extends AppCompatActivity {
     private ListenerRegistration statsListener;
     private ListenerRegistration urgentOrdersListener;
     private ListenerRegistration profileListener;
+    private ListenerRegistration notificationsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,7 @@ public class ProviderDashboardActivity extends AppCompatActivity {
         loadDashboardStats();
         listenForUrgentOrders();
         listenToProfile();
+        listenForNotifications();
     }
 
     private void initViews() {
@@ -199,7 +201,24 @@ public class ProviderDashboardActivity extends AppCompatActivity {
                                     break;
                             }
                         }
-                        updateBadge();
+                    }
+                });
+    }
+
+    private void listenForNotifications() {
+        if (userId == null) return;
+
+        notificationsListener = db.collection("notifications")
+                .whereEqualTo("provider_id", userId)
+                .whereEqualTo("read", false) // التحديث هنا: استخدام "read" بدلاً من "is_read"
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.e("Dashboard", "Error listening to notifications", e);
+                        return;
+                    }
+                    if (snapshots != null) {
+                        int unreadCount = snapshots.size();
+                        updateBadge(unreadCount);
                     }
                 });
     }
@@ -224,9 +243,8 @@ public class ProviderDashboardActivity extends AppCompatActivity {
         }
     }
 
-    private void updateBadge() {
+    private void updateBadge(int count) {
         if (tvNotificationBadge == null) return;
-        int count = urgentOrders.size();
         if (count > 0) {
             tvNotificationBadge.setVisibility(View.VISIBLE);
             tvNotificationBadge.setText(String.valueOf(count));
@@ -279,5 +297,6 @@ public class ProviderDashboardActivity extends AppCompatActivity {
         if (statsListener != null) statsListener.remove();
         if (urgentOrdersListener != null) urgentOrdersListener.remove();
         if (profileListener != null) profileListener.remove();
+        if (notificationsListener != null) notificationsListener.remove();
     }
 }

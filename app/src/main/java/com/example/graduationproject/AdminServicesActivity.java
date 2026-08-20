@@ -86,7 +86,7 @@ public class AdminServicesActivity extends AppCompatActivity {
         
         Map<String, Object> updates = new HashMap<>();
         updates.put("status", status);
-        updates.put("rejectReason", reason); // حفظ السبب في مستند الخدمة
+        updates.put("rejectReason", reason); 
         if ("approved".equals(status)) {
             updates.put("isActive", true);
         } else {
@@ -96,36 +96,48 @@ public class AdminServicesActivity extends AppCompatActivity {
         db.collection("services").document(service.getId())
                 .update(updates)
                 .addOnSuccessListener(aVoid -> {
-                    String msg = "approved".equals(status) ? "تم قبول الخدمة" : "تم رفض الخدمة";
+                    String msg = "approved".equals(status) ? "تم قبول الخدمة بنجاح ✅" : "تم رفض الخدمة";
                     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
                     
+                    // إرسال الإشعار للمزود فور النجاح في التحديث
                     sendNotificationToProvider(service, status, reason);
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "فشل تحديث الحالة", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, "فشل تحديث الحالة: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void sendNotificationToProvider(ServiceModel service, String status, String reason) {
-        if (service.getProviderId() == null) return;
+        String providerId = service.getProviderId();
+        if (providerId == null || providerId.isEmpty()) {
+            Log.e("AdminServices", "Provider ID missing for service: " + service.getId());
+            return;
+        }
 
         String title = "تحديث حالة الخدمة";
         String message;
+        
         if ("approved".equals(status)) {
-            message = "🎉 مبروك! تمت الموافقة على خدمتك: " + service.getNameAr() + ". يمكنك تفعيلها الآن لتظهر للزبائن.";
+            message = "🎉 مبروك! تمت الموافقة على خدمتك: (" + service.getNameAr() + "). أصبحت الخدمة الآن نشطة وتظهر للزبائن في الخريطة.";
         } else {
-            // تضمين سبب الرفض بوضوح في الرسالة
-            message = "⚠️ نعتذر، تم رفض خدمتك: " + service.getNameAr() + "\nسبب الرفض: " + (reason != null ? reason : "لم يتم ذكر سبب محدد.");
+            message = "⚠️ نعتذر، تم رفض طلبك للخدمة: (" + service.getNameAr() + "). السبب: " + (reason != null ? reason : "لم يتم تحديد سبب.");
         }
 
+        // إنشاء كائن الإشعار بأسماء الحقول المتوافقة مع NotificationModel
         Map<String, Object> notif = new HashMap<>();
-        notif.put("provider_id", service.getProviderId());
+        notif.put("userId", providerId);           // الحقل الذي يبحث عنه تطبيق المزود
+        notif.put("provider_id", providerId);      // لزيادة التوافق
         notif.put("title", title);
         notif.put("message", message);
         notif.put("type", "service_status");
-        notif.put("created_at", com.google.firebase.Timestamp.now());
-        notif.put("is_read", false);
+        notif.put("order_id", service.getId());    // نضع معرف الخدمة هنا للاستخدام مستقبلاً
+        notif.put("read", false);                  // يجب أن يكون "read" ليتوافق مع الموديل
+        notif.put("created_at", com.google.firebase.Timestamp.now()); // يجب أن يكون "created_at" للفرز الزمني
 
-        db.collection("notifications").add(notif);
+        // حفظ الإشعار في مجموعة الإشعارات العامة
+        db.collection("notifications")
+                .add(notif)
+                .addOnSuccessListener(docRef -> Log.d("AdminServices", "Notification document created: " + docRef.getId()))
+                .addOnFailureListener(e -> Log.e("AdminServices", "Firestore notification failed: " + e.getMessage()));
     }
 
     @Override

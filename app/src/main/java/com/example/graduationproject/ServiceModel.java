@@ -10,7 +10,9 @@ public class ServiceModel {
     @PropertyName("provider_name")
     private String providerName;
     @PropertyName("provider_type")
-    private String providerType; 
+    private String providerType;
+    @PropertyName("service_type")
+    private String serviceType;
     @PropertyName("provider_phone")
     private String providerPhone;
     @PropertyName("provider_email")
@@ -56,6 +58,11 @@ public class ServiceModel {
     public String getProviderType() { return providerType; }
     @PropertyName("provider_type")
     public void setProviderType(String providerType) { this.providerType = providerType; }
+
+    @PropertyName("service_type")
+    public String getServiceType() { return serviceType; }
+    @PropertyName("service_type")
+    public void setServiceType(String serviceType) { this.serviceType = serviceType; }
     
     @PropertyName("provider_phone")
     public String getProviderPhone() { return providerPhone; }

@@ -38,6 +38,7 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
     private TextView tvActiveInitiativesCount, tvWelcome;
     private TextView tvTotalWaterDistributed;
     private TextView tvTotalFamiliesBenefited;
+    private ImageView btnLogout;
 
     private LinearLayout navHome, navMap, navAdd, navProfile;
 
@@ -69,6 +70,7 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
         btnCreateInitiative = findViewById(R.id.btnCreateInitiative);
         btnExploreMap = findViewById(R.id.btnExploreMap);
         rvInitiatives = findViewById(R.id.rv_initiatives);
+        btnLogout = findViewById(R.id.btnLogout);
 
         tvWelcome = findViewById(R.id.tvWelcome);
         tvActiveInitiativesCount = findViewById(R.id.tvActiveInitiativesCount);
@@ -113,7 +115,7 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("name");
+                            String name = documentSnapshot.getString("full_name");
                             if (name != null && !name.isEmpty()) {
                                 tvWelcome.setText("مرحباً بعودتك، " + name);
                             }
@@ -278,6 +280,16 @@ public class InitiatorDashboardActivity extends AppCompatActivity {
             btnExploreMap.setOnClickListener(v -> {
                 Intent intent = new Intent(this, NeedMapActivity.class);
                 startActivity(intent);
+            });
+        }
+
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> {
+                mAuth.signOut();
+                Intent intent = new Intent(InitiatorDashboardActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
             });
         }
     }

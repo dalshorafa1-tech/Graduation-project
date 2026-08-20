@@ -2,6 +2,7 @@ package com.example.graduationproject;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,8 +41,10 @@ public class EditServiceActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
+        // جلب معرف الخدمة من الـ Intent
         serviceId = getIntent().getStringExtra("service_id");
         if (serviceId == null) {
+            Toast.makeText(this, "خطأ: لم يتم العثور على بيانات الخدمة", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -50,7 +53,7 @@ public class EditServiceActivity extends AppCompatActivity {
         loadServiceData();
 
         btnBack.setOnClickListener(v -> finish());
-        btnSaveEdits.setOnClickListener(v -> saveChanges());
+        btnSaveEdits.setOnClickListener(v -> validateAndSave());
     }
 
     private void initViews() {
@@ -69,50 +72,69 @@ public class EditServiceActivity extends AppCompatActivity {
                 currentService = doc.toObject(ServiceModel.class);
                 if (currentService != null) {
                     tvServiceName.setText(currentService.getNameAr());
-                    tvServiceId.setText("معرف الخدمة: #" + serviceId.substring(0, 6));
+                    tvServiceId.setText("معرف الخدمة: #" + serviceId.substring(0, Math.min(serviceId.length(), 6)));
                     etPriceLitre.setText(String.valueOf(currentService.getPrice()));
-                    if (currentService.getPriceCup() > 0) {
-                        etPriceCup.setText(String.valueOf(currentService.getPriceCup()));
-                    }
+                    etPriceCup.setText(String.valueOf(currentService.getPriceCup()));
                     switchAvailability.setChecked(currentService.isActive());
                 }
+            } else {
+                Toast.makeText(this, "الخدمة غير موجودة", Toast.LENGTH_SHORT).show();
+                finish();
             }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "فشل تحميل البيانات", Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void saveChanges() {
+    private void validateAndSave() {
         String priceStr = etPriceLitre.getText().toString().trim();
         String priceCupStr = etPriceCup.getText().toString().trim();
-        
+
+        // التحقق من المدخلات
         if (TextUtils.isEmpty(priceStr)) {
-            etPriceLitre.setError("السعر مطلوب");
+            etPriceLitre.setError("يرجى إدخال سعر اللتر");
             return;
         }
 
-        btnSaveEdits.setEnabled(false);
-        btnSaveEdits.setText("جاري إرسال التعديلات...");
+        if (TextUtils.isEmpty(priceCupStr)) {
+            etPriceCup.setError("يرجى إدخال سعر الكوب (أو 0)");
+            return;
+        }
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("price", Double.parseDouble(priceStr));
-        updates.put("priceCup", TextUtils.isEmpty(priceCupStr) ? 0.0 : Double.parseDouble(priceCupStr));
-        
-        // عند التعديل، نغير الحالة لتنتظر موافقة الأدمن مرة أخرى
-        updates.put("status", "pending");
-        updates.put("isActive", false); 
+        try {
+            double price = Double.parseDouble(priceStr);
+            double priceCup = Double.parseDouble(priceCupStr);
 
-        applyUpdatesToFirestore(updates);
+            saveChanges(price, priceCup);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "يرجى إدخال أرقام صحيحة للأسعار", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void applyUpdatesToFirestore(Map<String, Object> updates) {
-        db.collection("services").document(serviceId).update(updates)
+    private void saveChanges(double price, double priceCup) {
+        btnSaveEdits.setEnabled(false);
+        btnSaveEdits.setText("جاري الحفظ...");
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("price", price);
+        updates.put("priceCup", priceCup);
+        
+        // ملاحظة: عند تعديل السعر، تعود الخدمة للحالة "pending" ليتم مراجعتها من قبل الأدمن
+        updates.put("status", "pending");
+        updates.put("isActive", false); // إخفاء الخدمة مؤقتاً لحين قبول التعديلات
+        updates.put("updatedAt", com.google.firebase.Timestamp.now());
+
+        db.collection("services").document(serviceId)
+                .update(updates)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "تم إرسال التعديلات للأدمن للمراجعة", Toast.LENGTH_LONG).show();
-                    finish();
+                    Toast.makeText(this, "تم حفظ التعديلات وإرسالها للأدمن للمراجعة ✅", Toast.LENGTH_LONG).show();
+                    finish(); // العودة للشاشة السابقة
                 })
                 .addOnFailureListener(e -> {
                     btnSaveEdits.setEnabled(true);
                     btnSaveEdits.setText("حفظ التعديلات");
-                    Toast.makeText(this, "فشل الحفظ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("EditService", "Update failed: " + e.getMessage());
+                    Toast.makeText(this, "فشل حفظ التعديلات: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }

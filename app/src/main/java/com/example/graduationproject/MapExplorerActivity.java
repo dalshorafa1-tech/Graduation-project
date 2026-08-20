@@ -55,7 +55,7 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
     private CardView Confirm1;
     private CardView btnLoginMap;
 
-    private View btnLayerWater, btnLayerTruck, btnLayerStorage;
+    private View btnLayerWater, btnLayerTruck, btnLayerStorage, btnLayerInitiatives;
 
     private String currentFilter = null;
     private FirebaseFirestore db;
@@ -100,8 +100,9 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         if (etSearch != null) {
             etSearch.setOnEditorActionListener((v, actionId, event) -> {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
-                    fetchProviders(currentFilter, etSearch.getText().toString().trim());
-                    fetchInitiatives(etSearch.getText().toString().trim());
+                    String query = etSearch.getText().toString().trim();
+                    fetchProviders(currentFilter, query);
+                    fetchInitiatives(query);
                     return true;
                 }
                 return false;
@@ -136,6 +137,7 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         btnLayerWater = findViewById(R.id.btnFilterWell);
         btnLayerTruck = findViewById(R.id.btnFilterTruck);
         btnLayerStorage = findViewById(R.id.btnFilterStorage);
+        btnLayerInitiatives = findViewById(R.id.btnFilterInitiatives);
     }
 
     private void checkLoginStatus() {
@@ -155,6 +157,7 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         if (btnLayerWater != null) btnLayerWater.setOnClickListener(v -> handleFilterClick("well"));
         if (btnLayerTruck != null) btnLayerTruck.setOnClickListener(v -> handleFilterClick("truck"));
         if (btnLayerStorage != null) btnLayerStorage.setOnClickListener(v -> handleFilterClick("storage"));
+        if (btnLayerInitiatives != null) btnLayerInitiatives.setOnClickListener(v -> handleFilterClick("initiatives"));
 
         if (Confirm1 != null) {
             Confirm1.setOnClickListener(v -> {
@@ -193,9 +196,18 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
             Toast.makeText(this, "عرض الجميع", Toast.LENGTH_SHORT).show();
         } else {
             currentFilter = filterType;
-            Toast.makeText(this, "تصفية: " + filterType, Toast.LENGTH_SHORT).show();
+            String filterName = filterType;
+            if ("well".equals(filterType)) filterName = "آبار";
+            else if ("truck".equals(filterType)) filterName = "صهاريج";
+            else if ("storage".equals(filterType)) filterName = "خزانات";
+            else if ("initiatives".equals(filterType)) filterName = "مبادرات";
+            
+            Toast.makeText(this, "تصفية: " + filterName, Toast.LENGTH_SHORT).show();
         }
-        fetchProviders(currentFilter, etSearch != null ? etSearch.getText().toString().trim() : "");
+        
+        String query = etSearch != null ? etSearch.getText().toString().trim() : "";
+        fetchProviders(currentFilter, query);
+        fetchInitiatives(query);
     }
 
     private void fetchProviders(String filterType, String searchQuery) {
@@ -216,7 +228,12 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
                     Double lng = doc.getDouble("current_lng");
 
                     if (lat != null && lng != null) {
-                        if (filterType != null && !filterType.equalsIgnoreCase(type)) continue;
+                        // إذا كان الفلتر نشطاً وهو ليس "مبادرات"، نتحقق من النوع
+                        if (filterType != null) {
+                            if (filterType.equals("initiatives")) continue; // إخفاء المزودين عند تصفية المبادرات
+                            if (!filterType.equalsIgnoreCase(type)) continue;
+                        }
+                        
                         if (searchQuery != null && !searchQuery.isEmpty() && name != null && !name.toLowerCase().contains(searchQuery.toLowerCase())) continue;
 
                         Marker marker = mapboxMap.addMarker(new MarkerOptions()
@@ -234,6 +251,14 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
     private void fetchInitiatives(String searchQuery) {
         if (mapboxMap == null) return;
         if (initiativesListener != null) initiativesListener.remove();
+
+        // إذا كان الفلتر نشطاً وهو ليس "مبادرات"، نخفي المبادرات
+        if (currentFilter != null && !currentFilter.equals("initiatives")) {
+            for (Marker m : initiativeMarkers) mapboxMap.removeMarker(m);
+            initiativeMarkers.clear();
+            markerToInitiativeId.clear();
+            return;
+        }
 
         // جلب المبادرات المقبولة فقط (الحالة نشط)
         initiativesListener = db.collection("initiatives")

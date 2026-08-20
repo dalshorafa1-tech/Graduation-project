@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,10 +18,20 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddEditServiceActivity extends AppCompatActivity {
+public class AddEditServiceActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private TextInputEditText etName, etDescription;
     private EditText etPriceLitre, etPriceCup;
@@ -34,8 +45,17 @@ public class AddEditServiceActivity extends AppCompatActivity {
 
     private String editServiceId;
 
+    // Map fields
+    private MapView mapView;
+    private MapboxMap mapboxMap;
+    private Marker selectionMarker;
+    private double selectedLat = 31.5126; // Default to Gaza City
+    private double selectedLng = 34.4426;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Initialize Mapbox before setContentView
+        Mapbox.getInstance(this);
         super.onCreate(savedInstanceState);
 
         editServiceId = getIntent().getStringExtra("service_id");
@@ -55,6 +75,12 @@ public class AddEditServiceActivity extends AppCompatActivity {
             loadServiceForEdit(editServiceId);
         } else {
             if (tvHeaderTitle != null) tvHeaderTitle.setText("إضافة خدمة جديدة");
+            
+            // Initialize map only in Add mode (based on layout)
+            if (mapView != null) {
+                mapView.onCreate(savedInstanceState);
+                mapView.getMapAsync(this);
+            }
         }
 
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
@@ -79,8 +105,62 @@ public class AddEditServiceActivity extends AppCompatActivity {
             tvServiceId = findViewById(R.id.tvServiceId);
         } else {
             btnSave = findViewById(R.id.btnSaveService);
+            mapView = findViewById(R.id.mapview);
         }
     }
+
+    @Override
+    public void onMapReady(@NonNull MapboxMap mapboxMap) {
+        this.mapboxMap = mapboxMap;
+        mapboxMap.setStyle(new Style.Builder().fromUri("https://tiles.openfreemap.org/styles/bright"), style -> {
+            // Initial position
+            LatLng initialPoint = new LatLng(selectedLat, selectedLng);
+            mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialPoint, 13));
+
+            // إضافة دبوس (Marker) في الموقع الابتدائي
+            selectionMarker = mapboxMap.addMarker(new MarkerOptions()
+                    .position(initialPoint)
+                    .title("موقع الخدمة"));
+
+            // Center on provider's registered location if available
+            if (mAuth.getUid() != null) {
+                db.collection("providers").document(mAuth.getUid()).get().addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        Double lat = doc.getDouble("current_lat");
+                        Double lng = doc.getDouble("current_lng");
+                        if (lat != null && lng != null) {
+                            LatLng providerPos = new LatLng(lat, lng);
+                            mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(providerPos, 15));
+                            selectedLat = lat;
+                            selectedLng = lng;
+                            if (selectionMarker != null) {
+                                selectionMarker.setPosition(providerPos);
+                            }
+                        }
+                    }
+                });
+            }
+
+            // تحديث الموقع المختار عند النقر على الخريطة (تحريك الدبوس بدلاً من تحريك الخريطة)
+            mapboxMap.addOnMapClickListener(latLng -> {
+                selectedLat = latLng.getLatitude();
+                selectedLng = latLng.getLongitude();
+
+                if (selectionMarker != null) {
+                    selectionMarker.setPosition(latLng);
+                }
+                return true;
+            });
+        });
+    }
+
+    @Override protected void onStart() { super.onStart(); if (mapView != null) mapView.onStart(); }
+    @Override protected void onResume() { super.onResume(); if (mapView != null) mapView.onResume(); }
+    @Override protected void onPause() { super.onPause(); if (mapView != null) mapView.onPause(); }
+    @Override protected void onStop() { super.onStop(); if (mapView != null) mapView.onStop(); }
+    @Override protected void onSaveInstanceState(@NonNull Bundle outState) { super.onSaveInstanceState(outState); if (mapView != null) mapView.onSaveInstanceState(outState); }
+    @Override public void onLowMemory() { super.onLowMemory(); if (mapView != null) mapView.onLowMemory(); }
+    @Override protected void onDestroy() { if (mapView != null) mapView.onDestroy(); super.onDestroy(); }
 
     private void loadServiceForEdit(String serviceId) {
         db.collection("services").document(serviceId).get()
@@ -117,6 +197,13 @@ public class AddEditServiceActivity extends AppCompatActivity {
         btnSave.setEnabled(false);
         btnSave.setText("جاري الحفظ...");
 
+        if (mAuth.getUid() == null) {
+            Toast.makeText(this, "يجب تسجيل الدخول أولاً", Toast.LENGTH_SHORT).show();
+            btnSave.setEnabled(true);
+            btnSave.setText("حفظ");
+            return;
+        }
+
         db.collection("providers").document(mAuth.getUid()).get().addOnSuccessListener(providerDoc -> {
             Map<String, Object> data = new HashMap<>();
             data.put("name_ar", name);
@@ -132,8 +219,16 @@ public class AddEditServiceActivity extends AppCompatActivity {
                 data.put("provider_id_number", providerDoc.getString("id_number"));
                 data.put("municipality_code", providerDoc.getString("municipality_code"));
                 data.put("region", providerDoc.getString("location_name"));
-                data.put("latitude", providerDoc.getDouble("current_lat"));
-                data.put("longitude", providerDoc.getDouble("current_lng"));
+                
+                // Use selected map coordinates if adding a new service
+                if (editServiceId == null) {
+                    data.put("latitude", selectedLat);
+                    data.put("longitude", selectedLng);
+                } else {
+                    data.put("latitude", providerDoc.getDouble("current_lat"));
+                    data.put("longitude", providerDoc.getDouble("current_lng"));
+                }
+
                 data.put("provider_email", mAuth.getCurrentUser().getEmail());
             }
 

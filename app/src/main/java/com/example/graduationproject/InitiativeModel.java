@@ -14,9 +14,12 @@ public class InitiativeModel {
     private int currentLiters;
     private String fundingType;
     private String providerName;
-    private String providerId; // تم إضافة معرف المزود
+    private String providerId;
     private double estimatedCost;
-    private String status; // مثلاً: "نشط"، "مكتمل"، "قيد المراجعة"
+    private String status;
+    private String startDate; // تاريخ البداية
+    private String endDate;   // تاريخ النهاية
+    private String workingHours; // مواعيد العمل
 
     @ServerTimestamp
     private Date createdAt;
@@ -40,6 +43,17 @@ public class InitiativeModel {
         this.providerId = providerId;
         this.estimatedCost = estimatedCost;
         this.status = status;
+    }
+
+    public InitiativeModel(String id, String initiatorId, String title, String location, 
+                           double latitude, double longitude, int targetLiters, 
+                           int currentLiters, String fundingType, String providerName, 
+                           String providerId, double estimatedCost, String status,
+                           String startDate, String endDate, String workingHours) {
+        this(id, initiatorId, title, location, latitude, longitude, targetLiters, currentLiters, fundingType, providerName, providerId, estimatedCost, status);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.workingHours = workingHours;
     }
 
     // Getters and Setters
@@ -69,6 +83,12 @@ public class InitiativeModel {
     public void setEstimatedCost(double estimatedCost) { this.estimatedCost = estimatedCost; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getStartDate() { return startDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
+    public String getWorkingHours() { return workingHours; }
+    public void setWorkingHours(String workingHours) { this.workingHours = workingHours; }
 
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }

@@ -227,6 +227,42 @@
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Payment Receipt Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardReceipt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="إشعار الدفع"
+                        android:textColor="#1E293B"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"/>
+                    <ImageView
+                        android:id="@+id/ivOrderReceipt"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:scaleType="centerCrop"
+                        android:background="#F1F5F9"
+                        android:src="@drawable/img_1"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -30,19 +30,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="تعديل الخدمة"
+            android:text="تعديل بيانات الخدمة"
             android:textColor="#0A3A60"
             android:textSize="18sp"
             android:textStyle="bold" />
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/user"
-            app:strokeColor="#E2E8F0"
-            app:strokeWidth="1dp" />
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -58,6 +49,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- معلومات الخدمة الأساسية -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -68,46 +60,83 @@
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp">
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="right">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvServiceName"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="right">
+                        android:text="اسم الخدمة"
+                        android:textColor="#1E293B"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/tvServiceName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="اسم الخدمة"
-                            android:textColor="#1E293B"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvServiceId"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="معرف الخدمة"
-                            android:textColor="#64748B"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-                </RelativeLayout>
+                    <TextView
+                        android:id="@+id/tvServiceId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="معرف الخدمة: #"
+                        android:textColor="#64748B"
+                        android:textSize="12sp" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- تعديل نوع الخدمة -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="سعر الخدمة (شيكل)"
+                android:text="نوع الخدمة"
+                android:textColor="#0A3A60"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/rgEditServiceType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+
+                <RadioButton
+                    android:id="@+id/rbEditTruck"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="صهريج"
+                    android:textColor="#0A3A60" />
+
+                <RadioButton
+                    android:id="@+id/rbEditWell"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="آبار"
+                    android:textColor="#0A3A60" />
+
+                <RadioButton
+                    android:id="@+id/rbEditStorage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="خزانات"
+                    android:textColor="#0A3A60" />
+            </RadioGroup>
+
+            <!-- تعديل السعر -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="تعديل الأسعار (شيكل)"
                 android:textColor="#0069B4"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:layout_gravity="right"
                 android:layout_marginBottom="12dp" />
 
             <LinearLayout
@@ -122,43 +151,21 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:layout_marginLeft="6dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="سعر اللتر"
                         android:textColor="#64748B"
                         android:textSize="13sp"
-                        android:layout_gravity="right"
                         android:layout_marginBottom="6dp" />
-
-                    <RelativeLayout
+                    <EditText
+                        android:id="@+id/etPriceLitre"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:background="@drawable/bg_input_field"
-                        android:paddingHorizontal="12dp">
-                        <TextView
-                            android:id="@+id/tvCurrencyLitre"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:text="ILS"
-                            android:textColor="#64748B"
-                            android:textSize="14sp" />
-                        <EditText
-                            android:id="@+id/etPriceLitre"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_toLeftOf="@id/tvCurrencyLitre"
-                            android:background="@android:color/transparent"
-                            android:gravity="left|center_vertical"
-                            android:hint="0.00"
-                            android:textColor="#1E293B"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:inputType="numberDecimal" />
-                    </RelativeLayout>
+                        android:paddingHorizontal="12dp"
+                        android:inputType="numberDecimal"
+                        android:hint="0.00" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -167,140 +174,61 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:layout_marginRight="6dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="سعر الكوب (1000 لتر)"
+                        android:text="سعر الكوب"
                         android:textColor="#64748B"
                         android:textSize="13sp"
-                        android:layout_gravity="right"
                         android:layout_marginBottom="6dp" />
-
-                    <RelativeLayout
+                    <EditText
+                        android:id="@+id/etPriceCup"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:background="@drawable/bg_input_field"
-                        android:paddingHorizontal="12dp">
-                        <TextView
-                            android:id="@+id/tvCurrencyCup"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:text="ILS"
-                            android:textColor="#64748B"
-                            android:textSize="14sp" />
-                        <EditText
-                            android:id="@+id/etPriceCup"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_toLeftOf="@id/tvCurrencyCup"
-                            android:background="@android:color/transparent"
-                            android:gravity="left|center_vertical"
-                            android:hint="0.00"
-                            android:textColor="#1E293B"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:inputType="numberDecimal" />
-                    </RelativeLayout>
+                        android:paddingHorizontal="12dp"
+                        android:inputType="numberDecimal"
+                        android:hint="0.00" />
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- التوفر -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="#E2E8F0"
                 app:strokeWidth="1dp">
-
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp">
-
-                    <LinearLayout
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:orientation="vertical"
-                        android:gravity="right">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="حالة التوفر الحالية"
-                            android:textColor="#1E293B"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="تحكم في ظهور خدمتك للزبائن الآن"
-                            android:textColor="#64748B"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
+                        android:text="الحالة الحالية للخدمة"
+                        android:textColor="#1E293B"
+                        android:textStyle="bold" />
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchAvailability"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="متوفر الآن"
-                            android:textColor="#1E293B"
-                            android:textSize="13sp"
-                            android:layout_marginLeft="8dp" />
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switchAvailability"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
-                            app:thumbTint="#FFFFFF"
-                            app:trackTint="#0069B4" />
-                    </LinearLayout>
+                        android:layout_alignParentLeft="true" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#E0F2FE"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="14dp"
-                    android:gravity="right|center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginRight="10dp"
-                        android:text="ملاحظة: سيتم مراجعة التعديلات من قبل الإدارة قبل اعتمادها وظهورها للزبائن. يستغرق ذلك عادةً أقل من 24 ساعة."
-                        android:textColor="#0369A1"
-                        android:textSize="13sp"
-                        android:lineSpacingExtra="3dp"
-                        android:gravity="right" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:text="ملاحظة: عند حفظ التعديلات، سيتم مراجعتها من قبل الإدارة قبل نشرها للجمهور."
+                android:textColor="#0369A1"
+                android:background="#E0F2FE"
+                android:padding="12dp"
+                android:textSize="12sp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -310,28 +238,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
-        android:elevation="12dp"
-        android:orientation="vertical"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveEdits"
             android:layout_width="match_parent"
             android:layout_height="54dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp"
+            android:text="إرسال التعديلات للمراجعة"
             android:backgroundTint="#0A3A60"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="حفظ التعديلات"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="27dp"
-            app:icon="@drawable/sure"
-            app:iconGravity="textStart"
-            app:iconPadding="8dp" />
+            app:cornerRadius="27dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

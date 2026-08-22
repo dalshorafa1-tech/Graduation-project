@@ -1,6 +1,8 @@
 package com.example.graduationproject;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -38,6 +40,7 @@ import com.mapbox.mapboxsdk.maps.Style;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,9 +48,10 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
 
     private static final String TAG = "CreateInitiative";
 
-    private EditText etTitle, etWaterAmount, etLocation;
-    private TextView tvEstimatedCost;
+    private EditText etTitle, etWaterAmount, etLocation, etWorkingHours;
+    private TextView tvEstimatedCost, tvStartDate, tvEndDate;
     private MaterialButton btnSubmitInitiative;
+    private View btnStartDate, btnEndDate;
 
     private MaterialButtonToggleGroup toggleGroupFunding;
     private String selectedFundingType = "تمويل مؤسساتي";
@@ -84,7 +88,12 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
         etTitle = findViewById(R.id.etInitiativeName);
         etLocation = findViewById(R.id.spinner_target_district);
         etWaterAmount = findViewById(R.id.etWaterAmount);
+        etWorkingHours = findViewById(R.id.etWorkingHours);
         tvEstimatedCost = findViewById(R.id.tvEstimatedCost);
+        tvStartDate = findViewById(R.id.tvStartDate);
+        tvEndDate = findViewById(R.id.tvEndDate);
+        btnStartDate = findViewById(R.id.btnStartDate);
+        btnEndDate = findViewById(R.id.btnEndDate);
         btnSubmitInitiative = findViewById(R.id.btnPublishInitiative);
 
         toggleGroupFunding = findViewById(R.id.toggleGroupFunding);
@@ -102,6 +111,7 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
         setupWaterAmountInput();
         setupFundingSelection();
         setupProvidersList();
+        setupDatePickers();
         fetchProvidersFromFirestore();
         
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -109,6 +119,30 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
         if (btnSubmitInitiative != null) {
             btnSubmitInitiative.setOnClickListener(v -> saveInitiativeToFirebase());
         }
+    }
+
+    private void setupDatePickers() {
+        btnStartDate.setOnClickListener(v -> showDatePicker(true));
+        btnEndDate.setOnClickListener(v -> showDatePicker(false));
+    }
+
+    private void showDatePicker(boolean isStart) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
+            String date = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
+            if (isStart) {
+                tvStartDate.setText(date);
+                tvStartDate.setTextColor(Color.parseColor("#1E293B"));
+            } else {
+                tvEndDate.setText(date);
+                tvEndDate.setTextColor(Color.parseColor("#1E293B"));
+            }
+        }, year, month, day);
+        datePickerDialog.show();
     }
 
     private void setupProvidersList() {
@@ -248,6 +282,10 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
         String title = etTitle.getText().toString().trim();
         String location = etLocation.getText().toString().trim();
         String waterStr = etWaterAmount.getText().toString().trim();
+        String startDate = tvStartDate.getText().toString().trim();
+        String endDate = tvEndDate.getText().toString().trim();
+        String workingHours = etWorkingHours.getText().toString().trim();
+        
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if (currentUser == null) {
@@ -255,8 +293,9 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
             return;
         }
 
-        if (TextUtils.isEmpty(title) || TextUtils.isEmpty(location) || TextUtils.isEmpty(waterStr)) {
-            Toast.makeText(this, "🔴 يرجى إكمال جميع البيانات", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(title) || TextUtils.isEmpty(location) || TextUtils.isEmpty(waterStr) || 
+            startDate.equals("اختر التاريخ") || endDate.equals("اختر التاريخ") || TextUtils.isEmpty(workingHours)) {
+            Toast.makeText(this, "🔴 يرجى إكمال جميع البيانات بما في ذلك التواريخ ومواعيد العمل", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -287,9 +326,12 @@ public class CreateInitiativeActivity extends AppCompatActivity implements OnMap
                 0,
                 selectedFundingType,
                 selectedProviderName,
-                selectedProviderId, // تمرير معرف المزود
+                selectedProviderId,
                 currentEstimatedCost,
-                "قيد المراجعة"
+                "قيد المراجعة",
+                startDate,
+                endDate,
+                workingHours
         );
 
         db.collection("initiatives")

@@ -237,6 +237,8 @@
         app:cardElevation="10dp"
         app:cardBackgroundColor="#FFFFFF"
         app:strokeWidth="0dp"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <LinearLayout

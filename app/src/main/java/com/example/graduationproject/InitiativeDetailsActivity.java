@@ -38,6 +38,7 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
     private TextView tvInitiativeTitle, tvInitiativeLocation, tvWaterAmount, tvCost, tvInitiativeDesc;
     private TextView tvInitiativeStatus, tvInitiativeId, tvFundingType, tvProviderName;
     private TextView tvTotalFunded, tvProgressPercent, tvRemainingCost;
+    private TextView tvStartDate, tvEndDate, tvWorkingHours;
     private LinearProgressIndicator progressIndicator;
 
     private android.widget.ImageView ivNotificationBtn;
@@ -91,6 +92,11 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
         tvTotalFunded = findViewById(R.id.tv_total_funded);
         tvProgressPercent = findViewById(R.id.tvProgressPercent);
         tvRemainingCost = findViewById(R.id.tvRemainingCost);
+        
+        tvStartDate = findViewById(R.id.tvStartDate);
+        tvEndDate = findViewById(R.id.tvEndDate);
+        tvWorkingHours = findViewById(R.id.tvWorkingHours);
+        
         progressIndicator = findViewById(R.id.progressIndicator);
 
         ivNotificationBtn = findViewById(R.id.ivNotification);
@@ -139,6 +145,10 @@ public class InitiativeDetailsActivity extends AppCompatActivity implements OnMa
         tvWaterAmount.setText(String.format(Locale.getDefault(), "%, d لتر", initiative.getTargetLiters()));
         tvFundingType.setText(initiative.getFundingType());
         tvProviderName.setText(initiative.getProviderName() != null ? initiative.getProviderName() : "لم يحدد بعد");
+        
+        tvStartDate.setText(initiative.getStartDate() != null ? initiative.getStartDate() : "--");
+        tvEndDate.setText(initiative.getEndDate() != null ? initiative.getEndDate() : "--");
+        tvWorkingHours.setText(initiative.getWorkingHours() != null ? initiative.getWorkingHours() : "--");
         
         locationName = initiative.getLocation();
         

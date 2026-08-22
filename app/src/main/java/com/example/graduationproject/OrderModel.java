@@ -21,6 +21,7 @@ public class OrderModel {
     private String address_details;
     private String notes;
     private String scheduled_time;
+    private String receipt_url;
     private Object created_at;
 
     public OrderModel() {}
@@ -98,6 +99,11 @@ public class OrderModel {
     public String getScheduledTime() { return scheduled_time; }
     @PropertyName("scheduled_time")
     public void setScheduledTime(String scheduledTime) { this.scheduled_time = scheduledTime; }
+
+    @PropertyName("receipt_url")
+    public String getReceiptUrl() { return receipt_url; }
+    @PropertyName("receipt_url")
+    public void setReceiptUrl(String receiptUrl) { this.receipt_url = receiptUrl; }
 
     @PropertyName("created_at")
     public Object getCreatedAt() { return created_at; }

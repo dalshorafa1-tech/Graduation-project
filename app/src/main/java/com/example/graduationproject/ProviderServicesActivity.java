@@ -25,6 +25,7 @@ import java.util.List;
 
 public class ProviderServicesActivity extends AppCompatActivity {
 
+    private static final String TAG = "ProviderServices";
     private RecyclerView rvServices;
     private MaterialButton btnAddNewService;
     private TextView tvActiveServicesCount;
@@ -58,7 +59,7 @@ public class ProviderServicesActivity extends AppCompatActivity {
 
             @Override
             public void onEdit(ServiceModel service) {
-                Intent intent = new Intent(ProviderServicesActivity.this, AddEditServiceActivity.class);
+                Intent intent = new Intent(ProviderServicesActivity.this, EditServiceActivity.class);
                 intent.putExtra("service_id", service.getId());
                 startActivity(intent);
             }
@@ -73,7 +74,7 @@ public class ProviderServicesActivity extends AppCompatActivity {
         rvServices.setAdapter(adapter);
 
         btnAddNewService.setOnClickListener(v -> {
-            startActivity(new Intent(this, AddEditServiceActivity.class));
+            startActivity(new Intent(this, AddServiceActivity.class));
         });
 
         if (imgProfile != null) {
@@ -109,16 +110,21 @@ public class ProviderServicesActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
 
-        // تم تصحيح أسماء الحقول لتطابق Firestore (provider_id و created_at)
+        Log.d(TAG, "Listening for services for provider: " + userId);
+
+        // تم تبسيط الاستعلام بحذف orderBy مؤقتاً للتأكد من عدم وجود مشكلة في الفهارس (Indexes)
         servicesListener = db.collection("services")
                 .whereEqualTo("provider_id", userId)
-                .orderBy("created_at", Query.Direction.DESCENDING)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
-                        Log.e("ProviderServices", "Error listening for services: ", e);
+                        Log.e(TAG, "Error listening for services: ", e);
+                        Toast.makeText(this, "خطأ في جلب البيانات: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    
                     if (snapshots != null) {
+                        Log.d(TAG, "Found documents: " + snapshots.size());
+
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
                             ServiceModel service = dc.getDocument().toObject(ServiceModel.class);
                             service.setId(dc.getDocument().getId());

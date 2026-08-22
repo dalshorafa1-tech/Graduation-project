@@ -162,7 +162,7 @@ public class Order_Checkout_Activity extends AppCompatActivity implements OnMapR
         }
         if (navWallet != null) navWallet.setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
         if (navOrders != null) navOrders.setOnClickListener(v -> startActivity(new Intent(this, My_Orders_Activity.class)));
-        if (navProfile != null) navProfile.setOnClickListener(v -> startActivity(new Intent(this, HomeActivity.class)));
+   //     if (navProfile != null) navProfile.setOnClickListener(v -> startActivity(new Intent(this, HomeActivity.class)));
     }
 
     private void updateQuantityText() {

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import java.util.Map;
 
 public class EditProfileActivity extends AppCompatActivity {
 
+    private static final String TAG = "EditProfileActivity";
     private TextInputEditText etFullName, etPhoneNumber, etEmail, etAddress;
     private ShapeableImageView ivUserAvatar;
     private FirebaseFirestore db;
@@ -49,7 +51,14 @@ public class EditProfileActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        storage = FirebaseStorage.getInstance();
+        
+        // Explicitly initialize FirebaseStorage with the bucket from google-services.json
+        try {
+            storage = FirebaseStorage.getInstance("gs://erwaa-app-c4e5c.firebasestorage.app");
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing FirebaseStorage", e);
+            storage = FirebaseStorage.getInstance();
+        }
         
         if (mAuth.getCurrentUser() != null) {
             userId = mAuth.getCurrentUser().getUid();
@@ -108,7 +117,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 saveChanges(uri.toString());
             });
         }).addOnFailureListener(e -> {
-            Toast.makeText(this, "فشل رفع الصورة", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Upload failed: " + e.getMessage(), e);
+            Toast.makeText(this, "فشل رفع الصورة: " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             saveChanges(null);
         });
     }

@@ -93,35 +93,50 @@ public class SettingsActivity extends AppCompatActivity {
     private void setupSwitches() {
         SharedPreferences prefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
 
-        switchNotifications.setChecked(prefs.getBoolean("notifications", true));
-        switchDataSaver.setChecked(prefs.getBoolean("data_saver", false));
+        if (switchNotifications != null) {
+            switchNotifications.setChecked(prefs.getBoolean("notifications", true));
+            switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                prefs.edit().putBoolean("notifications", isChecked).apply();
+            });
+        }
 
-        switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            prefs.edit().putBoolean("notifications", isChecked).apply();
-        });
-
-        switchDataSaver.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            prefs.edit().putBoolean("data_saver", isChecked).apply();
-        });
+        if (switchDataSaver != null) {
+            switchDataSaver.setChecked(prefs.getBoolean("data_saver", false));
+            switchDataSaver.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                prefs.edit().putBoolean("data_saver", isChecked).apply();
+            });
+        }
     }
 
     private void setupBottomNavigation() {
-        // زر الرئيسية يفتح شاشة الملف الشخصي (fragment_profile)
-        findViewById(R.id.navHome).setOnClickListener(v -> {
-            Intent intent = new Intent(this, Profile.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
+        // زر الرئيسية
+        View navDashboard = findViewById(R.id.navDashboard);
+        if (navDashboard != null) {
+            navDashboard.setOnClickListener(v -> {
+                Intent intent = new Intent(this, Profile.class); // Note: Profile.class name seems odd for "Home", but kept as per original logic
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            });
+        }
 
-        // زر المحفظة يفتح شاشة المحفظة
-        findViewById(R.id.navWallet).setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
+        // زر المحفظة
+        View navWallet = findViewById(R.id.navWallet);
+        if (navWallet != null) {
+            navWallet.setOnClickListener(v -> startActivity(new Intent(this, WalletActivity.class)));
+        }
 
-        // زر الطلبات يفتح شاشة طلباتي
-        findViewById(R.id.navOrders).setOnClickListener(v -> startActivity(new Intent(this, My_Orders_Activity.class)));
+        // زر الطلبات
+        View navNeedMap = findViewById(R.id.navNeedMap);
+        if (navNeedMap != null) {
+            navNeedMap.setOnClickListener(v -> startActivity(new Intent(this, My_Orders_Activity.class)));
+        }
 
-        // زر حسابي (أنت الآن في شاشة الإعدادات التابعة له)
-        findViewById(R.id.navProfile).setOnClickListener(v -> {
-            // حالياً في شاشة الإعدادات
-        });
+        // زر حسابي
+        View navInitiators = findViewById(R.id.navInitiators);
+        if (navInitiators != null) {
+            navInitiators.setOnClickListener(v -> {
+                // حالياً في شاشة الإعدادات
+            });
+        }
     }
 }

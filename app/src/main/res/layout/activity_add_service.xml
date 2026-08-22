@@ -77,22 +77,46 @@
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- نوع الخدمة باستخدام MaterialAutoCompleteTextView -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutServiceType"
+            <!-- اختيار نوع الخدمة باستخدام RadioButtons -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="نوع الخدمة"
+                android:textColor="#0A3A60"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/rgServiceType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="نوع الخدمة"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-                <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                    android:id="@+id/spinnerServiceType"
-                    android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/rbTruck"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:inputType="none"
-                    android:textSize="14sp"
+                    android:layout_weight="1"
+                    android:text="صهريج"
                     android:textColor="#0A3A60" />
-            </com.google.android.material.textfield.TextInputLayout>
+
+                <RadioButton
+                    android:id="@+id/rbWell"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="آبار"
+                    android:textColor="#0A3A60" />
+
+                <RadioButton
+                    android:id="@+id/rbStorage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="خزانات"
+                    android:textColor="#0A3A60" />
+            </RadioGroup>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -167,6 +191,16 @@
                         android:id="@+id/mapview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
+
+                    <!-- Center Pin View -->
+                    <ImageView
+                        android:id="@+id/imgCenterPin"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/location"
+                        android:layout_marginBottom="16dp"
+                        app:tint="#EF4444" />
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -174,7 +208,7 @@
                 android:id="@+id/tvLocationTip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="اضغط على الخريطة لتحديد موقع الخدمة بدقة."
+                android:text="حرك الخريطة لتضع الدبوس على موقع الخدمة بدقة."
                 android:textColor="#64748B"
                 android:textSize="12sp"
                 android:layout_marginBottom="16dp" />

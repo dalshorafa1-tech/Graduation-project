@@ -106,10 +106,114 @@
                 android:textColor="#64748B"
                 android:textSize="14sp"/>
 
+            <!-- قسم مواعيد المبادرة الجديد -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="#E2E8F0"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="فترة المبادرة ومواعيدها"
+                        android:textColor="#1E293B"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_location_pin"
+                            app:tint="#64748B"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
+                            android:text="تاريخ البدء:"
+                            android:textColor="#64748B"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/tvStartDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="4dp"
+                            android:text="--"
+                            android:textColor="#1E293B"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="12dp"
+                            android:layout_marginHorizontal="12dp"
+                            android:background="#E2E8F0"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="تاريخ الانتهاء:"
+                            android:textColor="#64748B"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/tvEndDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="4dp"
+                            android:text="--"
+                            android:textColor="#1E293B"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_pin_truck"
+                            app:tint="#64748B"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
+                            android:text="ساعات العمل:"
+                            android:textColor="#64748B"
+                            android:textSize="12sp"/>
+                        <TextView
+                            android:id="@+id/tvWorkingHours"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="4dp"
+                            android:text="--"
+                            android:textColor="#1E293B"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
 

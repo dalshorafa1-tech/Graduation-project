@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
@@ -32,7 +33,8 @@ import java.util.Locale;
 public class ProviderOrderDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private TextView tvOrderNumber, tvOrderStatus, tvCustomerName, tvCustomerAddress, tvWaterType, tvWaterQty, tvPriceTotal;
-    private ImageView imgCustomer;
+    private ImageView imgCustomer, ivOrderReceipt;
+    private CardView cardReceipt;
     private MaterialButton btnConfirmArrival, btnCompleteTask;
     private View btnCallCustomer;
     private MapView map;
@@ -73,6 +75,8 @@ public class ProviderOrderDetailsActivity extends AppCompatActivity implements O
         tvWaterQty = findViewById(R.id.tvWaterQty);
         tvPriceTotal = findViewById(R.id.tvPriceTotal);
         imgCustomer = findViewById(R.id.imgCustomer);
+        ivOrderReceipt = findViewById(R.id.ivOrderReceipt);
+        cardReceipt = findViewById(R.id.cardReceipt);
         btnConfirmArrival = findViewById(R.id.btnConfirmArrival);
         btnCompleteTask = findViewById(R.id.btnCompleteTask);
         btnCallCustomer = findViewById(R.id.btnCallCustomer);
@@ -133,6 +137,14 @@ public class ProviderOrderDetailsActivity extends AppCompatActivity implements O
 
                 updateStatusUI(order.getStatus());
                 
+                // عرض إشعار الدفع إذا وجد
+                if (order.getReceiptUrl() != null && !order.getReceiptUrl().isEmpty()) {
+                    cardReceipt.setVisibility(View.VISIBLE);
+                    Glide.with(this).load(order.getReceiptUrl()).into(ivOrderReceipt);
+                } else {
+                    cardReceipt.setVisibility(View.GONE);
+                }
+
                 // تحديث موقع الزبون على الخريطة
                 if (order.getDeliveryLat() != 0) {
                     deliveryLocation = new LatLng(order.getDeliveryLat(), order.getDeliveryLng());

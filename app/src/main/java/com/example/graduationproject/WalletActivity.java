@@ -120,7 +120,7 @@ public class WalletActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.navProfile).setOnClickListener(v -> {
-            startActivity(new Intent(this, HomeActivity.class));
+//            startActivity(new Intent(this, HomeActivity.class));
         });
     }
 

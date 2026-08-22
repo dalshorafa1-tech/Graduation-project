@@ -68,7 +68,7 @@ public class My_Orders_Activity extends AppCompatActivity {
             finish();
         });
         findViewById(R.id.navProfile).setOnClickListener(v -> {
-            startActivity(new Intent(this, HomeActivity.class));
+     //       startActivity(new Intent(this, HomeActivity.class));
         });
     }
 

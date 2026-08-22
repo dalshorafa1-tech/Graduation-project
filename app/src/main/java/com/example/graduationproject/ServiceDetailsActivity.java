@@ -1,5 +1,6 @@
 package com.example.graduationproject;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -10,16 +11,22 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Locale;
 
 public class ServiceDetailsActivity extends AppCompatActivity {
 
     private TextView tvName, tvStatus, tvPrice, tvPriceCup, tvDesc, tvRejectReason;
+    private TextView tvServiceType, tvProviderName, tvRegion, tvPhone;
     private ImageView btnBack;
+    private MaterialButton btnRequestService;
     private MaterialCardView cardRejectReason;
     private FirebaseFirestore db;
     private String serviceId;
+    private ServiceModel currentService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +48,18 @@ public class ServiceDetailsActivity extends AppCompatActivity {
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
         }
+
+        if (btnRequestService != null) {
+            btnRequestService.setOnClickListener(v -> {
+                if (currentService != null) {
+                    Intent intent = new Intent(ServiceDetailsActivity.this, Order_Checkout_Activity.class);
+                    intent.putExtra("service_id", currentService.getId());
+                    intent.putExtra("provider_id", currentService.getProviderId());
+                    intent.putExtra("provider_name", currentService.getProviderName());
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     private void initViews() {
@@ -50,17 +69,25 @@ public class ServiceDetailsActivity extends AppCompatActivity {
         tvPriceCup = findViewById(R.id.tvDetailPriceCup);
         tvDesc = findViewById(R.id.tvDetailDesc);
         tvRejectReason = findViewById(R.id.tvDetailRejectReason);
+        
+        tvServiceType = findViewById(R.id.tvDetailServiceType);
+        tvProviderName = findViewById(R.id.tvDetailProviderName);
+        tvRegion = findViewById(R.id.tvDetailRegion);
+        tvPhone = findViewById(R.id.tvDetailPhone);
+
         cardRejectReason = findViewById(R.id.cardRejectReasonDetail);
         btnBack = findViewById(R.id.btnBack);
+        btnRequestService = findViewById(R.id.btnRequestService);
     }
 
     private void loadServiceDetails() {
         db.collection("services").document(serviceId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        ServiceModel service = documentSnapshot.toObject(ServiceModel.class);
-                        if (service != null) {
-                            displayService(service);
+                        currentService = documentSnapshot.toObject(ServiceModel.class);
+                        if (currentService != null) {
+                            currentService.setId(documentSnapshot.getId());
+                            displayService(currentService);
                         }
                     }
                 })
@@ -71,12 +98,25 @@ public class ServiceDetailsActivity extends AppCompatActivity {
 
     private void displayService(ServiceModel service) {
         tvName.setText(service.getNameAr());
-        tvDesc.setText(service.getDescriptionAr());
-        tvPrice.setText(String.format("%.2f ₪", service.getPrice()));
-        tvPriceCup.setText(String.format("%.2f ₪", service.getPriceCup()));
+        tvDesc.setText(TextUtils.isEmpty(service.getDescriptionAr()) ? "لا يوجد وصف متاح لهذه الخدمة." : service.getDescriptionAr());
+        
+        tvPrice.setText(String.format(Locale.getDefault(), "%.2f ₪", service.getPrice()));
+        tvPriceCup.setText(String.format(Locale.getDefault(), "%.2f ₪", service.getPriceCup()));
+
+        tvServiceType.setText("نوع الخدمة: " + (service.getServiceType() != null ? service.getServiceType() : "غير محدد"));
+        tvProviderName.setText(service.getProviderName() != null ? service.getProviderName() : "غير متوفر");
+        tvRegion.setText("المنطقة: " + (service.getRegion() != null ? service.getRegion() : "غير محددة"));
+        tvPhone.setText("رقم التواصل: " + (service.getProviderPhone() != null ? service.getProviderPhone() : "غير متوفر"));
 
         String status = service.getStatus() != null ? service.getStatus() : "pending";
         setupStatusBadge(status);
+
+        // إظهار زر الطلب فقط إذا كانت الخدمة مقبولة
+        if ("approved".equals(status)) {
+            if (btnRequestService != null) btnRequestService.setVisibility(View.VISIBLE);
+        } else {
+            if (btnRequestService != null) btnRequestService.setVisibility(View.GONE);
+        }
 
         if ("rejected".equals(status) && !TextUtils.isEmpty(service.getRejectReason())) {
             cardRejectReason.setVisibility(View.VISIBLE);
@@ -90,7 +130,7 @@ public class ServiceDetailsActivity extends AppCompatActivity {
         switch (status) {
             case "pending":
                 tvStatus.setText("قيد المراجعة");
-                tvStatus.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
+                tvStatus.setBackgroundResource(R.drawable.bg_alert_blue); // Assuming this is available
                 break;
             case "approved":
                 tvStatus.setText("مقبول");
@@ -99,6 +139,9 @@ public class ServiceDetailsActivity extends AppCompatActivity {
             case "rejected":
                 tvStatus.setText("مرفوض");
                 tvStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                break;
+            default:
+                tvStatus.setText(status);
                 break;
         }
     }

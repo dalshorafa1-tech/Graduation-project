@@ -181,13 +181,13 @@ public class AdminInitiativesActivity extends AppCompatActivity implements Admin
     @Override
     public void onApprove(InitiativeModel initiative) {
         db.collection("initiatives").document(initiative.getId())
-                .update("status", "نشط")
+                .update("status", "بانتظار موافقة المزود") // تغيير الحالة لتتطلب موافقة المزود
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "تمت الموافقة على المبادرة بنجاح", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "تم إرسال طلب المبادرة للمزود", Toast.LENGTH_SHORT).show();
                     sendNotificationToProvider(initiative);
-                    sendNotificationToInitiator(initiative);
+                    // لا يتم إرسال إشعار للمبادر هنا، بل عند قبول المزود نهائياً
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "فشل في الموافقة: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(this, "فشل في الإرسال: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void sendNotificationToProvider(InitiativeModel initiative) {
@@ -198,9 +198,9 @@ public class AdminInitiativesActivity extends AppCompatActivity implements Admin
 
         NotificationModel notification = new NotificationModel();
         notification.setProvider_id(initiative.getProviderId());
-        notification.setTitle("مبادرة جديدة معتمدة");
-        notification.setMessage("تم اختيارك لتزويد مبادرة: " + initiative.getTitle() + "\nالكمية المطلوبة: " + initiative.getTargetLiters() + " لتر\nالموقع: " + initiative.getLocation());
-        notification.setType("INITIATIVE_APPROVED");
+        notification.setTitle("مبادرة جديدة بانتظار موافقتك");
+        notification.setMessage("تم ترشيحك لتزويد مبادرة: " + initiative.getTitle() + "\nالكمية: " + initiative.getTargetLiters() + " لتر. يرجى المراجعة والرد.");
+        notification.setType("INITIATIVE_PROVIDER_REQUEST"); // نوع خاص للمزود
         notification.setOrder_id(initiative.getId());
         notification.setRead(false);
         notification.setCreated_at(Timestamp.now());
@@ -211,31 +211,10 @@ public class AdminInitiativesActivity extends AppCompatActivity implements Admin
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to send notification to provider", e));
     }
 
-    private void sendNotificationToInitiator(InitiativeModel initiative) {
-        if (initiative.getInitiatorId() == null || initiative.getInitiatorId().isEmpty()) {
-            Log.e(TAG, "Cannot send notification: Initiator ID is null or empty");
-            return;
-        }
-
-        NotificationModel notification = new NotificationModel();
-        notification.setUserId(initiative.getInitiatorId()); // استخدام userId للمبادر
-        notification.setTitle("تم قبول مبادرتك ✅");
-        notification.setMessage("تهانينا! تم قبول مبادرتك: " + initiative.getTitle() + ". هي الآن نشطة ويمكن للمستفيدين رؤيتها.");
-        notification.setType("INITIATIVE_ACCEPTED_INITIATOR");
-        notification.setOrder_id(initiative.getId());
-        notification.setRead(false);
-        notification.setCreated_at(Timestamp.now());
-
-        db.collection("notifications")
-                .add(notification)
-                .addOnSuccessListener(documentReference -> Log.d(TAG, "Notification sent to initiator: " + initiative.getInitiatorId()))
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to send notification to initiator", e));
-    }
-
     @Override
     public void onReject(InitiativeModel initiative) {
         db.collection("initiatives").document(initiative.getId())
-                .update("status", "مرفوض")
+                .update("status", "مرفوض من الأدمن")
                 .addOnSuccessListener(aVoid -> Toast.makeText(this, "تم رفض المبادرة", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Toast.makeText(this, "فشل في الرفض: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }

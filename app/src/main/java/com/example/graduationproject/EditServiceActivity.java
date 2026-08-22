@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +26,8 @@ public class EditServiceActivity extends AppCompatActivity {
     private ImageView btnBack;
     private TextView tvServiceName, tvServiceId;
     private EditText etPriceLitre, etPriceCup;
+    private RadioGroup rgServiceType;
+    private RadioButton rbTruck, rbWell, rbStorage;
     private SwitchMaterial switchAvailability;
     private MaterialButton btnSaveEdits;
 
@@ -62,6 +66,10 @@ public class EditServiceActivity extends AppCompatActivity {
         tvServiceId = findViewById(R.id.tvServiceId);
         etPriceLitre = findViewById(R.id.etPriceLitre);
         etPriceCup = findViewById(R.id.etPriceCup);
+        rgServiceType = findViewById(R.id.rgEditServiceType);
+        rbTruck = findViewById(R.id.rbEditTruck);
+        rbWell = findViewById(R.id.rbEditWell);
+        rbStorage = findViewById(R.id.rbEditStorage);
         switchAvailability = findViewById(R.id.switchAvailability);
         btnSaveEdits = findViewById(R.id.btnSaveEdits);
     }
@@ -76,6 +84,12 @@ public class EditServiceActivity extends AppCompatActivity {
                     etPriceLitre.setText(String.valueOf(currentService.getPrice()));
                     etPriceCup.setText(String.valueOf(currentService.getPriceCup()));
                     switchAvailability.setChecked(currentService.isActive());
+                    
+                    // تحديد نوع الخدمة الحالي في الـ RadioGroup
+                    String type = currentService.getServiceType();
+                    if ("صهريج".equals(type)) rbTruck.setChecked(true);
+                    else if ("آبار".equals(type)) rbWell.setChecked(true);
+                    else if ("خزانات".equals(type)) rbStorage.setChecked(true);
                 }
             } else {
                 Toast.makeText(this, "الخدمة غير موجودة", Toast.LENGTH_SHORT).show();
@@ -90,51 +104,75 @@ public class EditServiceActivity extends AppCompatActivity {
         String priceStr = etPriceLitre.getText().toString().trim();
         String priceCupStr = etPriceCup.getText().toString().trim();
 
+        // الحصول على النوع المختار
+        int selectedId = rgServiceType.getCheckedRadioButtonId();
+        String selectedType = "";
+        if (selectedId != -1) {
+            RadioButton rb = findViewById(selectedId);
+            selectedType = rb.getText().toString();
+        }
+
         // التحقق من المدخلات
         if (TextUtils.isEmpty(priceStr)) {
             etPriceLitre.setError("يرجى إدخال سعر اللتر");
             return;
         }
 
-        if (TextUtils.isEmpty(priceCupStr)) {
-            etPriceCup.setError("يرجى إدخال سعر الكوب (أو 0)");
+        if (TextUtils.isEmpty(selectedType)) {
+            Toast.makeText(this, "يرجى اختيار نوع الخدمة", Toast.LENGTH_SHORT).show();
             return;
         }
 
         try {
             double price = Double.parseDouble(priceStr);
-            double priceCup = Double.parseDouble(priceCupStr);
+            double priceCup = TextUtils.isEmpty(priceCupStr) ? 0.0 : Double.parseDouble(priceCupStr);
 
-            saveChanges(price, priceCup);
+            saveChanges(price, priceCup, selectedType);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "يرجى إدخال أرقام صحيحة للأسعار", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void saveChanges(double price, double priceCup) {
+    private void saveChanges(double price, double priceCup, String serviceType) {
         btnSaveEdits.setEnabled(false);
-        btnSaveEdits.setText("جاري الحفظ...");
+        btnSaveEdits.setText("جاري إرسال التعديلات...");
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("price", price);
         updates.put("priceCup", priceCup);
+        updates.put("service_type", serviceType);
         
-        // ملاحظة: عند تعديل السعر، تعود الخدمة للحالة "pending" ليتم مراجعتها من قبل الأدمن
+        // عند التعديل، تعود الخدمة للمراجعة وتتوقف مؤقتاً
         updates.put("status", "pending");
-        updates.put("isActive", false); // إخفاء الخدمة مؤقتاً لحين قبول التعديلات
+        updates.put("isActive", false); 
         updates.put("updatedAt", com.google.firebase.Timestamp.now());
+        updates.put("isEdited", true); // علامة للأدمن أن هذه تعديلات وليست خدمة جديدة
 
         db.collection("services").document(serviceId)
                 .update(updates)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "تم حفظ التعديلات وإرسالها للأدمن للمراجعة ✅", Toast.LENGTH_LONG).show();
-                    finish(); // العودة للشاشة السابقة
+                    // إضافة إشعار للأدمن في قاعدة البيانات
+                    sendAdminNotification();
+                    
+                    Toast.makeText(this, "تم إرسال التعديلات للأدمن للمراجعة ✅ سيتم إشعارك عند القبول", Toast.LENGTH_LONG).show();
+                    finish(); 
                 })
                 .addOnFailureListener(e -> {
                     btnSaveEdits.setEnabled(true);
                     btnSaveEdits.setText("حفظ التعديلات");
-                    Log.e("EditService", "Update failed: " + e.getMessage());
-                    Toast.makeText(this, "فشل حفظ التعديلات: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "فشل الإرسال: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private void sendAdminNotification() {
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("title", "طلب تعديل خدمة");
+        notification.put("message", "قام المزود " + (currentService != null ? currentService.getProviderName() : "") + " بتعديل بيانات الخدمة: " + (currentService != null ? currentService.getNameAr() : ""));
+        notification.put("type", "service_edit");
+        notification.put("serviceId", serviceId);
+        notification.put("timestamp", com.google.firebase.Timestamp.now());
+        notification.put("read", false);
+
+        db.collection("admin_notifications").add(notification);
     }
 }

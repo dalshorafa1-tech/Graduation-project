@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -49,7 +50,7 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
     private MapView mapView;
     private MapboxMap mapboxMap;
     private EditText etSearch;
-    private CardView bottomSheetCard;
+    private MaterialCardView bottomSheetCard; // تم تغيير النوع لـ MaterialCardView ليتطابق مع الـ XML
     private BottomSheetBehavior<MaterialCardView> bottomSheetBehavior;
     private TextView tvLocationTitle, tvLocationAddress, tvNearestSource;
     private CardView Confirm1;
@@ -63,18 +64,12 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
     private ListenerRegistration servicesListener;
     private ListenerRegistration initiativesListener;
 
-    private List<Marker> providerMarkers = new ArrayList<>();
+    private List<Marker> serviceMarkers = new ArrayList<>();
     private List<Marker> initiativeMarkers = new ArrayList<>();
-    private Map<Marker, String> markerToProviderId = new HashMap<>();
+    private Map<Marker, String> markerToServiceId = new HashMap<>();
     private Map<Marker, String> markerToInitiativeId = new HashMap<>();
 
-    private String selectedProviderId = "";
-    private String selectedProviderName = "";
-    private String selectedSourceType = "";
-    private String selectedAddress = "";
-    private double selectedLat = 0;
-    private double selectedLng = 0;
-    private boolean isPickLocationMode = false;
+    private String selectedId = "";
     private boolean isInitiativeSelected = false;
 
     private static final LatLng GAZA_CITY_CENTER = new LatLng(31.5126, 34.4426);
@@ -86,7 +81,6 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
 
         Mapbox.getInstance(this);
         mAuth = FirebaseAuth.getInstance();
-        isPickLocationMode = getIntent().getBooleanExtra("pick_location", false);
         setContentView(R.layout.activity_map_explorer);
 
         db = FirebaseFirestore.getInstance();
@@ -101,7 +95,7 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
             etSearch.setOnEditorActionListener((v, actionId, event) -> {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
                     String query = etSearch.getText().toString().trim();
-                    fetchProviders(currentFilter, query);
+                    fetchServices(currentFilter, query);
                     fetchInitiatives(query);
                     return true;
                 }
@@ -109,19 +103,10 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
             });
         }
 
-        if (bottomSheetCard != null) {
-            bottomSheetBehavior = BottomSheetBehavior.from((MaterialCardView) bottomSheetCard);
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        }
-
+        setupBottomSheet();
         setupClickListeners();
         setupBottomNavigation();
         checkLoginStatus();
-
-        if (isPickLocationMode) {
-            if (findViewById(R.id.btnConfirm) != null) findViewById(R.id.btnConfirm).setVisibility(View.GONE);
-            if (findViewById(R.id.bottomSheetCard) != null) findViewById(R.id.bottomSheetCard).setVisibility(View.GONE);
-        }
     }
 
     private void initViews() {
@@ -140,16 +125,16 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         btnLayerInitiatives = findViewById(R.id.btnFilterInitiatives);
     }
 
-    private void checkLoginStatus() {
-        if (btnLoginMap != null) {
-            if (mAuth.getCurrentUser() == null) {
-                btnLoginMap.setVisibility(View.VISIBLE);
-                btnLoginMap.setOnClickListener(v -> {
-                    startActivity(new Intent(MapExplorerActivity.this, LoginActivity.class));
-                });
-            } else {
-                btnLoginMap.setVisibility(View.GONE);
-            }
+    private void setupBottomSheet() {
+        if (bottomSheetCard != null) {
+            bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetCard);
+            // البدء بحالة مخفية تماماً
+            bottomSheetBehavior.setHideable(true);
+            bottomSheetBehavior.setPeekHeight(0);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+            // جعل البطاقة بالكامل قابلة للنقر للانتقال للتفاصيل
+            bottomSheetCard.setOnClickListener(v -> navigateToDetails());
         }
     }
 
@@ -159,24 +144,34 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         if (btnLayerStorage != null) btnLayerStorage.setOnClickListener(v -> handleFilterClick("storage"));
         if (btnLayerInitiatives != null) btnLayerInitiatives.setOnClickListener(v -> handleFilterClick("initiatives"));
 
+        // زر التأكيد داخل البطاقة يقوم بنفس وظيفة النقر على البطاقة
         if (Confirm1 != null) {
-            Confirm1.setOnClickListener(v -> {
-                if (isInitiativeSelected) {
-                    Intent intent = new Intent(this, InitiativeDetailsActivity.class);
-                    intent.putExtra("initiative_id", selectedProviderId);
-                    startActivity(intent);
-                } else {
-                    if (selectedProviderId == null || selectedProviderId.isEmpty()) return;
-                    Intent intent = new Intent(this, ProviderDetailsActivity.class);
-                    intent.putExtra("provider_id", selectedProviderId);
-                    intent.putExtra("provider_name", selectedProviderName);
-                    intent.putExtra("source_type", selectedSourceType);
-                    intent.putExtra("address", selectedAddress);
-                    intent.putExtra("lat", selectedLat);
-                    intent.putExtra("lng", selectedLng);
-                    startActivity(intent);
-                }
-            });
+            Confirm1.setOnClickListener(v -> navigateToDetails());
+        }
+    }
+
+    private void navigateToDetails() {
+        if (selectedId == null || selectedId.isEmpty()) return;
+
+        Intent intent;
+        if (isInitiativeSelected) {
+            intent = new Intent(this, InitiativeDetailsActivity.class);
+            intent.putExtra("initiative_id", selectedId);
+        } else {
+            intent = new Intent(this, ServiceDetailsActivity.class);
+            intent.putExtra("service_id", selectedId);
+        }
+        startActivity(intent);
+    }
+
+    private void checkLoginStatus() {
+        if (btnLoginMap != null) {
+            if (mAuth.getCurrentUser() == null) {
+                btnLoginMap.setVisibility(View.VISIBLE);
+                btnLoginMap.setOnClickListener(v -> startActivity(new Intent(MapExplorerActivity.this, LoginActivity.class)));
+            } else {
+                btnLoginMap.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -191,68 +186,61 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
     }
 
     private void handleFilterClick(String filterType) {
-        if (filterType.equals(currentFilter)) {
-            currentFilter = null;
-            Toast.makeText(this, "عرض الجميع", Toast.LENGTH_SHORT).show();
-        } else {
-            currentFilter = filterType;
-            String filterName = filterType;
-            if ("well".equals(filterType)) filterName = "آبار";
-            else if ("truck".equals(filterType)) filterName = "صهاريج";
-            else if ("storage".equals(filterType)) filterName = "خزانات";
-            else if ("initiatives".equals(filterType)) filterName = "مبادرات";
-            
-            Toast.makeText(this, "تصفية: " + filterName, Toast.LENGTH_SHORT).show();
-        }
-        
+        currentFilter = filterType.equals(currentFilter) ? null : filterType;
         String query = etSearch != null ? etSearch.getText().toString().trim() : "";
-        fetchProviders(currentFilter, query);
+        fetchServices(currentFilter, query);
         fetchInitiatives(query);
     }
 
-    private void fetchProviders(String filterType, String searchQuery) {
+    private void fetchServices(String filterType, String searchQuery) {
         if (mapboxMap == null) return;
         if (servicesListener != null) servicesListener.remove();
 
-        servicesListener = db.collection("providers").addSnapshotListener((value, error) -> {
+        Query query = db.collection("services").whereEqualTo("status", "approved");
+
+        servicesListener = query.addSnapshotListener((value, error) -> {
             if (error != null) return;
             if (value != null) {
-                for (Marker m : providerMarkers) mapboxMap.removeMarker(m);
-                providerMarkers.clear();
-                markerToProviderId.clear();
+                for (Marker m : serviceMarkers) mapboxMap.removeMarker(m);
+                serviceMarkers.clear();
+                markerToServiceId.clear();
 
                 for (DocumentSnapshot doc : value.getDocuments()) {
-                    String name = doc.getString("business_name");
-                    String type = doc.getString("provider_type");
-                    Double lat = doc.getDouble("current_lat");
-                    Double lng = doc.getDouble("current_lng");
+                    String name = doc.getString("name_ar");
+                    String typeStr = doc.getString("service_type");
+                    Double lat = doc.getDouble("latitude");
+                    Double lng = doc.getDouble("longitude");
 
                     if (lat != null && lng != null) {
-                        // إذا كان الفلتر نشطاً وهو ليس "مبادرات"، نتحقق من النوع
-                        if (filterType != null) {
-                            if (filterType.equals("initiatives")) continue; // إخفاء المزودين عند تصفية المبادرات
-                            if (!filterType.equalsIgnoreCase(type)) continue;
-                        }
-                        
+                        String mappedType = mapTypeToKey(typeStr);
+                        if (filterType != null && !filterType.equals("initiatives") && !filterType.equalsIgnoreCase(mappedType)) continue;
+                        if (filterType != null && filterType.equals("initiatives")) continue;
                         if (searchQuery != null && !searchQuery.isEmpty() && name != null && !name.toLowerCase().contains(searchQuery.toLowerCase())) continue;
 
                         Marker marker = mapboxMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(lat, lng))
-                                .icon(getIconByType(type))
+                                .icon(getIconByMappedType(mappedType))
                                 .title(name));
-                        providerMarkers.add(marker);
-                        markerToProviderId.put(marker, doc.getId());
+                        serviceMarkers.add(marker);
+                        markerToServiceId.put(marker, doc.getId());
                     }
                 }
             }
         });
     }
 
+    private String mapTypeToKey(String typeAr) {
+        if (typeAr == null) return "";
+        if (typeAr.contains("آبار") || typeAr.contains("بئر")) return "well";
+        if (typeAr.contains("صهريج") || typeAr.contains("شاحنة")) return "truck";
+        if (typeAr.contains("خزانات") || typeAr.contains("خزان")) return "storage";
+        return "";
+    }
+
     private void fetchInitiatives(String searchQuery) {
         if (mapboxMap == null) return;
         if (initiativesListener != null) initiativesListener.remove();
 
-        // إذا كان الفلتر نشطاً وهو ليس "مبادرات"، نخفي المبادرات
         if (currentFilter != null && !currentFilter.equals("initiatives")) {
             for (Marker m : initiativeMarkers) mapboxMap.removeMarker(m);
             initiativeMarkers.clear();
@@ -260,7 +248,6 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
             return;
         }
 
-        // جلب المبادرات المقبولة فقط (الحالة نشط)
         initiativesListener = db.collection("initiatives")
                 .whereEqualTo("status", "نشط")
                 .addSnapshotListener((value, error) -> {
@@ -290,11 +277,11 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         });
     }
 
-    private Icon getIconByType(String type) {
+    private Icon getIconByMappedType(String type) {
         int resId = R.drawable.ic_location_pin;
-        if ("well".equalsIgnoreCase(type)) resId = R.drawable.ic_pin_well;
-        else if ("truck".equalsIgnoreCase(type)) resId = R.drawable.ic_pin_truck;
-        else if ("storage".equalsIgnoreCase(type)) resId = R.drawable.ic_pin_storage;
+        if ("well".equals(type)) resId = R.drawable.ic_pin_well;
+        else if ("truck".equals(type)) resId = R.drawable.ic_pin_truck;
+        else if ("storage".equals(type)) resId = R.drawable.ic_pin_storage;
         return getIconFromVector(resId);
     }
 
@@ -308,17 +295,15 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         return IconFactory.getInstance(this).fromBitmap(bitmap);
     }
 
-    private void showProviderDetails(String providerId) {
+    private void showServiceDetails(String serviceId) {
         isInitiativeSelected = false;
-        db.collection("providers").document(providerId).get().addOnSuccessListener(doc -> {
+        db.collection("services").document(serviceId).get().addOnSuccessListener(doc -> {
             if (doc.exists()) {
-                selectedProviderId = doc.getId();
-                selectedProviderName = doc.getString("business_name");
-                selectedSourceType = doc.getString("provider_type");
-                selectedAddress = doc.getString("location_name");
-                tvLocationTitle.setText(selectedProviderName);
-                tvLocationAddress.setText(selectedAddress);
-                tvNearestSource.setText("عرض التفاصيل والطلب");
+                selectedId = doc.getId();
+                tvLocationTitle.setText(doc.getString("name_ar"));
+                String region = doc.getString("region");
+                tvLocationAddress.setText(region != null ? region : "المنطقة غير محددة");
+                tvNearestSource.setText("عرض تفاصيل الخدمة والطلب");
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
         });
@@ -328,11 +313,9 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
         isInitiativeSelected = true;
         db.collection("initiatives").document(initiativeId).get().addOnSuccessListener(doc -> {
             if (doc.exists()) {
-                selectedProviderId = doc.getId();
-                selectedProviderName = doc.getString("title");
-                selectedAddress = doc.getString("location");
-                tvLocationTitle.setText(selectedProviderName);
-                tvLocationAddress.setText(selectedAddress);
+                selectedId = doc.getId();
+                tvLocationTitle.setText(doc.getString("title"));
+                tvLocationAddress.setText(doc.getString("location"));
                 tvNearestSource.setText("مبادرة سقاية - عرض التفاصيل");
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
@@ -342,13 +325,19 @@ public class MapExplorerActivity extends AppCompatActivity implements OnMapReady
     @Override public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         mapboxMap.setOnMarkerClickListener(marker -> {
-            if (markerToProviderId.containsKey(marker)) showProviderDetails(markerToProviderId.get(marker));
+            if (markerToServiceId.containsKey(marker)) showServiceDetails(markerToServiceId.get(marker));
             else if (markerToInitiativeId.containsKey(marker)) showInitiativeDetails(markerToInitiativeId.get(marker));
+            return true;
+        });
+        mapboxMap.addOnMapClickListener(point -> {
+            if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
             return true;
         });
         mapboxMap.setStyle(new Style.Builder().fromUri("https://tiles.openfreemap.org/styles/bright"), style -> {
             mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder().target(GAZA_CITY_CENTER).zoom(DETAILED_ZOOM).build()));
-            fetchProviders(currentFilter, "");
+            fetchServices(currentFilter, "");
             fetchInitiatives("");
         });
     }

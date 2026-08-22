@@ -44,18 +44,25 @@ public class ProviderServicesAdapter extends RecyclerView.Adapter<ProviderServic
     public void onBindViewHolder(@NonNull ServiceViewHolder holder, int position) {
         ServiceModel service = services.get(position);
         
-        // التحقق من الاسم وتجنب ظهور "غير مسمى" إذا كانت البيانات موجودة
         String serviceName = !TextUtils.isEmpty(service.getNameAr()) ? service.getNameAr() : "خدمة جديدة";
-        holder.tvServiceName.setText(serviceName);
+        String serviceType = !TextUtils.isEmpty(service.getServiceType()) ? service.getServiceType() : "غير محدد";
         
+        holder.tvServiceName.setText(serviceName + " (" + serviceType + ")");
         holder.tvServiceDesc.setText(service.getDescriptionAr() != null ? service.getDescriptionAr() : "");
         holder.tvServicePrice.setText(String.format("%.2f ₪", service.getPrice()));
 
-        // إدارة حالة الموافقة (Admin Status)
+        // تعيين أيقونة بناءً على النوع
+        if ("صهريج".equals(serviceType)) {
+            holder.imgServiceIcon.setImageResource(R.drawable.truck);
+        } else if ("آبار".equals(serviceType)) {
+            holder.imgServiceIcon.setImageResource(R.drawable.water);
+        } else {
+            holder.imgServiceIcon.setImageResource(R.drawable.barrel);
+        }
+
         String status = service.getStatus() != null ? service.getStatus() : "pending";
         setupStatusBadge(holder.tvStatusBadge, status);
 
-        // إظهار سبب الرفض إذا وجد
         if ("rejected".equals(status) && !TextUtils.isEmpty(service.getRejectReason())) {
             holder.layoutRejectReason.setVisibility(View.VISIBLE);
             holder.tvRejectReason.setText(service.getRejectReason());
@@ -63,22 +70,14 @@ public class ProviderServicesAdapter extends RecyclerView.Adapter<ProviderServic
             holder.layoutRejectReason.setVisibility(View.GONE);
         }
 
-        // إدارة مفتاح التفعيل (Switch)
         holder.switchStatus.setOnCheckedChangeListener(null);
         holder.switchStatus.setChecked(service.isActive());
         
-        // لا يمكن تفعيل الخدمة إلا إذا وافق عليها الأدمن
         boolean isApproved = "approved".equals(status);
         holder.switchStatus.setEnabled(isApproved);
         
-        // تحديث الألوان بناءً على حالة التفعيل
         updateSwitchColors(holder.switchStatus, service.isActive());
-
-        if (!isApproved) {
-            holder.switchStatus.setAlpha(0.5f);
-        } else {
-            holder.switchStatus.setAlpha(1.0f);
-        }
+        holder.switchStatus.setAlpha(isApproved ? 1.0f : 0.5f);
 
         holder.switchStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
             updateSwitchColors(holder.switchStatus, isChecked);
